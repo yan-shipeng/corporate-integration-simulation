@@ -43,6 +43,13 @@
       "when": 1777342318055,
       "tag": "0005_early_red_shift",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1778862584097,
+      "tag": "0006_late_ego",
+      "breakpoints": true
     }
   ]
 }

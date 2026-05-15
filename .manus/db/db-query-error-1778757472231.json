@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  s.id,\n  s.player_name,\n  s.final_score,\n  s.outcome,\n  s.converted_count,\n  s.weeks_used,\n  FROM_UNIXTIME(s.created_at / 1000) AS created_at_utc,\n  COUNT(t.id) AS turn_count\nFROM game_sessions s\nLEFT JOIN game_turns t ON t.session_id = s.id\nWHERE s.created_at < UNIX_TIMESTAMP('2026-05-14 00:00:00+08:00') * 1000\nGROUP BY s.id\nORDER BY s.created_at DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3k3ax81rNkRFWWS.0ad58c5ead25 --database MZbuA6LEkSmcNKPG5ajaYp --execute \nSELECT \n  s.id,\n  s.player_name,\n  s.final_score,\n  s.outcome,\n  s.converted_count,\n  s.weeks_used,\n  FROM_UNIXTIME(s.created_at / 1000) AS created_at_utc,\n  COUNT(t.id) AS turn_count\nFROM game_sessions s\nLEFT JOIN game_turns t ON t.session_id = s.id\nWHERE s.created_at < UNIX_TIMESTAMP('2026-05-14 00:00:00+08:00') * 1000\nGROUP BY s.id\nORDER BY s.created_at DESC;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 't.session_id' in 'on clause'"
+  ]
+}

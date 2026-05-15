@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE FROM game_turns WHERE sessionId IN (1590001, 1560001, 1530004, 1530003, 1530002, 1530001, 1500003, 1500002, 1500001, 1470001);\nDELETE FROM game_sessions WHERE id IN (1590001, 1560001, 1530004, 1530003, 1530002, 1530001, 1500003, 1500002, 1500001, 1470001);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3k3ax81rNkRFWWS.0ad58c5ead25 --database MZbuA6LEkSmcNKPG5ajaYp --execute \nDELETE FROM game_turns WHERE sessionId IN (1590001, 1560001, 1530004, 1530003, 1530002, 1530001, 1500003, 1500002, 1500001, 1470001);\nDELETE FROM game_sessions WHERE id IN (1590001, 1560001, 1530004, 1530003, 1530002, 1530001, 1500003, 1500002, 1500001, 1470001);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2879
+}

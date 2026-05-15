@@ -9,10 +9,13 @@ import GamePage from "./pages/GamePage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import ComparePage from "./pages/ComparePage";
 import GameTestPage from "./pages/GameTestPage";
+import EnHome from "./pages/en/EnHome";
+import EnGamePage from "./pages/en/EnGamePage";
+import EnLeaderboardPage from "./pages/en/EnLeaderboardPage";
 
 function Router() {
   const [location] = useLocation();
-  const isGameRoute = location === "/game" || location === "/game-test";
+  const isGameRoute = location === "/game" || location === "/game-test" || location === "/en/game";
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <main className={isGameRoute ? "flex-1 flex flex-col h-screen" : "flex-1"}>
@@ -23,6 +26,9 @@ function Router() {
           <Route path="/compare/:idA/:idB" component={ComparePage} />
           <Route path="/compare" component={LeaderboardPage} />
           <Route path="/game-test" component={GameTestPage} />
+          <Route path="/en" component={EnHome} />
+          <Route path="/en/game" component={EnGamePage} />
+          <Route path="/en/leaderboard" component={EnLeaderboardPage} />
           <Route path="/404" component={NotFound} />
           <Route component={NotFound} />
         </Switch>

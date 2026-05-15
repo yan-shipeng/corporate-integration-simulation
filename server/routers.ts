@@ -12,6 +12,14 @@ import {
   getSessionTurns,
   getLeaderboard,
   getLeaderboardStats,
+  createEnGameSession,
+  updateEnGameSession,
+  getEnGameSession,
+  getEnSessionsByPlayerName,
+  saveEnTurn,
+  getEnSessionTurns,
+  getEnLeaderboard,
+  getEnLeaderboardStats,
   resetDb,
 } from "./db";
 
@@ -235,6 +243,125 @@ const compareRouter = router({
     }),
 });
 
+const enGameRouter = router({
+  startSession: publicProcedure
+    .input(z.object({ playerName: z.string().min(1).max(64) }))
+    .mutation(async ({ input }) => {
+      const sessionId = await withDbRetry(() => createEnGameSession({
+        playerName: input.playerName,
+        status: "active",
+        startedAt: new Date(),
+      }));
+      return { sessionId };
+    }),
+
+  saveTurn: publicProcedure
+    .input(z.object({
+      sessionId: z.number(),
+      round: z.number(),
+      actionId: z.string().optional(),
+      actionLabel: z.string().optional(),
+      targets: z.array(z.string()).optional(),
+      prediction: z.string().optional(),
+      scoreDeltas: z.array(z.object({ personId: z.string(), nameCn: z.string(), before: z.number(), after: z.number() })).optional(),
+      credibilityAfter: z.number(),
+      pressureAfter: z.number(),
+      resourcesAfter: z.number(),
+      outcome: z.string().optional(),
+      actionType: z.string().optional(),
+      story: z.string().optional(),
+      deltaConverted: z.number().optional(),
+      weeksUsed: z.number().optional(),
+      turnScore: z.number().optional(),
+      milestones: z.array(z.string()).optional(),
+      movers: z.array(z.object({ id: z.string(), name: z.string(), before: z.number(), after: z.number() })).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const session = await withDbRetry(() => getEnGameSession(input.sessionId));
+      if (!session) throw new Error("Session not found");
+      const turnId = await withDbRetry(() => saveEnTurn({
+        sessionId: input.sessionId,
+        round: input.round,
+        actionId: input.actionId,
+        actionLabel: input.actionLabel,
+        targets: input.targets ?? [],
+        prediction: input.prediction,
+        scoreDeltas: input.scoreDeltas ?? [],
+        credibilityAfter: input.credibilityAfter,
+        pressureAfter: input.pressureAfter,
+        resourcesAfter: input.resourcesAfter,
+        outcome: input.outcome,
+        actionType: input.actionType,
+        story: input.story,
+        deltaConverted: input.deltaConverted ?? 0,
+        weeksUsed: input.weeksUsed ?? 0,
+        turnScore: input.turnScore ?? 0,
+        milestones: input.milestones ?? [],
+        movers: input.movers ?? [],
+      }));
+      return { turnId };
+    }),
+
+  endSession: publicProcedure
+    .input(z.object({
+      sessionId: z.number(),
+      status: z.enum(["win", "fail"]),
+      resourcesLeft: z.number(),
+      finalCredibility: z.number(),
+      finalPressure: z.number(),
+      convertedCount: z.number(),
+      totalRounds: z.number(),
+      totalScore: z.number().optional(),
+      baseScore: z.number().optional(),
+      conversionScore: z.number().optional(),
+      healthScore: z.number().optional(),
+      aggressiveIndex: z.number().optional().default(0),
+      conservativeIndex: z.number().optional().default(0),
+    }))
+    .mutation(async ({ input }) => {
+      const session = await withDbRetry(() => getEnGameSession(input.sessionId));
+      if (!session) throw new Error("Session not found");
+      const scores = (input.totalScore != null)
+        ? { totalScore: input.totalScore, baseScore: input.baseScore ?? 0, efficiencyScore: 0, healthScore: input.healthScore ?? 0, overAchievementScore: 0 }
+        : computeScore({ status: input.status, resourcesLeft: input.resourcesLeft, finalCredibility: input.finalCredibility, finalPressure: input.finalPressure, convertedCount: input.convertedCount });
+      await withDbRetry(() => updateEnGameSession(input.sessionId, {
+        status: input.status,
+        resourcesLeft: input.resourcesLeft,
+        finalCredibility: input.finalCredibility,
+        finalPressure: input.finalPressure,
+        convertedCount: input.convertedCount,
+        totalRounds: input.totalRounds,
+        aggressiveIndex: input.aggressiveIndex,
+        conservativeIndex: input.conservativeIndex,
+        ...scores,
+        endedAt: new Date(),
+      }));
+      return { scores };
+    }),
+
+  getSession: publicProcedure
+    .input(z.object({ sessionId: z.number() }))
+    .query(async ({ input }) => {
+      const session = await withDbRetry(() => getEnGameSession(input.sessionId));
+      if (!session) throw new Error("Session not found");
+      const turns = await withDbRetry(() => getEnSessionTurns(input.sessionId));
+      return { session, turns };
+    }),
+});
+
+const enLeaderboardRouter = router({
+  list: publicProcedure
+    .input(z.object({ limit: z.number().optional().default(50) }))
+    .query(async ({ input }) => {
+      const rows = await withDbRetry(() => getEnLeaderboard(input.limit));
+      return rows.map((r, i) => ({ ...r, rank: i + 1 }));
+    }),
+
+  stats: publicProcedure.query(async () => {
+    return withDbRetry(() => getEnLeaderboardStats());
+  }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -249,6 +376,8 @@ export const appRouter = router({
   leaderboard: leaderboardRouter,
   history: historyRouter,
   compare: compareRouter,
+  enGame: enGameRouter,
+  enLeaderboard: enLeaderboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

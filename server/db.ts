@@ -1,7 +1,7 @@
 import { eq, desc, asc, and, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql2 from "mysql2";
-import { InsertUser, users, gameSessions, gameTurns, InsertGameSession, InsertGameTurn } from "../drizzle/schema";
+import { InsertUser, users, gameSessions, gameTurns, InsertGameSession, InsertGameTurn, enGameSessions, enGameTurns, InsertEnGameSession, InsertEnGameTurn } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -192,4 +192,81 @@ export async function getLeaderboardStats() {
     avgOverAchievement: sum.over / n,
     count: n,
   };
+}
+
+// ─── English Game Sessions ────────────────────────────────────────────────────
+
+export async function createEnGameSession(data: InsertEnGameSession) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(enGameSessions).values(data);
+  return (result as any).insertId as number;
+}
+
+export async function updateEnGameSession(id: number, data: Partial<InsertEnGameSession>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(enGameSessions).set(data).where(eq(enGameSessions.id, id));
+}
+
+export async function getEnGameSession(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(enGameSessions).where(eq(enGameSessions.id, id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function getEnSessionsByPlayerName(playerName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(enGameSessions)
+    .where(eq(enGameSessions.playerName, playerName))
+    .orderBy(desc(enGameSessions.startedAt));
+}
+
+// ─── English Game Turns ───────────────────────────────────────────────────────
+
+export async function saveEnTurn(data: InsertEnGameTurn) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(enGameTurns).values({
+    ...data,
+    targets: data.targets ?? [],
+    scoreDeltas: data.scoreDeltas ?? [],
+  });
+  return (result as any).insertId as number;
+}
+
+export async function getEnSessionTurns(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(enGameTurns)
+    .where(eq(enGameTurns.sessionId, sessionId))
+    .orderBy(asc(enGameTurns.round));
+}
+
+// ─── English Leaderboard ─────────────────────────────────────────────────────
+
+export async function getEnLeaderboard(limit = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(enGameSessions)
+    .where(inArray(enGameSessions.status, ["win", "fail"]))
+    .orderBy(desc(enGameSessions.totalScore))
+    .limit(limit);
+}
+
+export async function getEnLeaderboardStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const rows = await db.select().from(enGameSessions).where(inArray(enGameSessions.status, ["win", "fail"]));
+  if (rows.length === 0) return { avgTotal: 0, avgEfficiency: 0, avgHealth: 0, avgOverAchievement: 0, count: 0 };
+  const sum = rows.reduce((acc, r) => ({
+    total: acc.total + (r.totalScore ?? 0),
+    eff: acc.eff + (r.efficiencyScore ?? 0),
+    health: acc.health + (r.healthScore ?? 0),
+    over: acc.over + (r.overAchievementScore ?? 0),
+  }), { total: 0, eff: 0, health: 0, over: 0 });
+  const n = rows.length;
+  return { avgTotal: sum.total / n, avgEfficiency: sum.eff / n, avgHealth: sum.health / n, avgOverAchievement: sum.over / n, count: n };
 }

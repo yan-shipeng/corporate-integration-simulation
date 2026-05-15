@@ -91,3 +91,59 @@ export const gameTurns = mysqlTable("game_turns", {
 
 export type GameTurn = typeof gameTurns.$inferSelect;
 export type InsertGameTurn = typeof gameTurns.$inferInsert;
+
+/**
+ * English version: One row per completed (or in-progress) game session.
+ */
+export const enGameSessions = mysqlTable("en_game_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  playerName: varchar("playerName", { length: 128 }),
+  status: mysqlEnum("status", ["active", "win", "fail"]).default("active").notNull(),
+  resourcesLeft: int("resourcesLeft").default(0),
+  finalCredibility: int("finalCredibility").default(0),
+  finalPressure: int("finalPressure").default(0),
+  convertedCount: int("convertedCount").default(0),
+  totalRounds: int("totalRounds").default(0),
+  baseScore: int("baseScore").default(0),
+  efficiencyScore: float("efficiencyScore").default(0),
+  healthScore: float("healthScore").default(0),
+  overAchievementScore: float("overAchievementScore").default(0),
+  totalScore: float("totalScore").default(0),
+  aggressiveIndex: int("aggressiveIndex").default(0),
+  conservativeIndex: int("conservativeIndex").default(0),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  endedAt: timestamp("endedAt"),
+});
+
+export type EnGameSession = typeof enGameSessions.$inferSelect;
+export type InsertEnGameSession = typeof enGameSessions.$inferInsert;
+
+/**
+ * English version: One row per turn within a session.
+ */
+export const enGameTurns = mysqlTable("en_game_turns", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: int("sessionId").notNull(),
+  round: int("round").notNull(),
+  actionId: varchar("actionId", { length: 64 }),
+  actionLabel: varchar("actionLabel", { length: 128 }),
+  targets: json("targets").$type<string[]>(),
+  prediction: text("prediction"),
+  scoreDeltas: json("scoreDeltas").$type<Array<{ personId: string; nameCn: string; before: number; after: number }>>(),
+  credibilityAfter: int("credibilityAfter").default(0),
+  pressureAfter: int("pressureAfter").default(0),
+  resourcesAfter: int("resourcesAfter").default(0),
+  outcome: varchar("outcome", { length: 32 }),
+  actionType: varchar("actionType", { length: 64 }),
+  story: text("story"),
+  deltaConverted: int("deltaConverted").default(0),
+  weeksUsed: int("weeksUsed").default(0),
+  turnScore: float("turnScore").default(0),
+  milestones: json("milestones").$type<string[]>(),
+  movers: json("movers").$type<Array<{ id: string; name: string; before: number; after: number }>>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EnGameTurn = typeof enGameTurns.$inferSelect;
+export type InsertEnGameTurn = typeof enGameTurns.$inferInsert;

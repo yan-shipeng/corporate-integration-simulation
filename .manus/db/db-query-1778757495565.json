@@ -1,0 +1,120 @@
+{
+  "query": "\nSELECT \n  s.id,\n  s.playerName,\n  s.totalScore,\n  s.status,\n  s.convertedCount,\n  s.totalRounds,\n  s.startedAt,\n  s.endedAt,\n  COUNT(t.id) AS turn_count\nFROM game_sessions s\nLEFT JOIN game_turns t ON t.sessionId = s.id\nWHERE s.startedAt < '2026-05-14 00:00:00'\nGROUP BY s.id\nORDER BY s.startedAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3k3ax81rNkRFWWS.0ad58c5ead25 --database MZbuA6LEkSmcNKPG5ajaYp --execute \nSELECT \n  s.id,\n  s.playerName,\n  s.totalScore,\n  s.status,\n  s.convertedCount,\n  s.totalRounds,\n  s.startedAt,\n  s.endedAt,\n  COUNT(t.id) AS turn_count\nFROM game_sessions s\nLEFT JOIN game_turns t ON t.sessionId = s.id\nWHERE s.startedAt < '2026-05-14 00:00:00'\nGROUP BY s.id\nORDER BY s.startedAt DESC;\n",
+  "rows": [
+    {
+      "id": "1590001",
+      "playerName": "大王",
+      "totalScore": "0",
+      "status": "active",
+      "convertedCount": "0",
+      "totalRounds": "0",
+      "startedAt": "2026-05-09 10:06:19",
+      "endedAt": "NULL",
+      "turn_count": "2"
+    },
+    {
+      "id": "1560001",
+      "playerName": "ll",
+      "totalScore": "0",
+      "status": "active",
+      "convertedCount": "0",
+      "totalRounds": "0",
+      "startedAt": "2026-04-29 03:36:37",
+      "endedAt": "NULL",
+      "turn_count": "15"
+    },
+    {
+      "id": "1530004",
+      "playerName": "李四",
+      "totalScore": "55",
+      "status": "win",
+      "convertedCount": "7",
+      "totalRounds": "27",
+      "startedAt": "2026-04-28 14:04:47",
+      "endedAt": "2026-04-28 14:32:03",
+      "turn_count": "26"
+    },
+    {
+      "id": "1530003",
+      "playerName": "李四",
+      "totalScore": "33",
+      "status": "fail",
+      "convertedCount": "5",
+      "totalRounds": "28",
+      "startedAt": "2026-04-28 13:28:21",
+      "endedAt": "2026-04-28 14:03:12",
+      "turn_count": "27"
+    },
+    {
+      "id": "1530002",
+      "playerName": "张久峰",
+      "totalScore": "71",
+      "status": "win",
+      "convertedCount": "10",
+      "totalRounds": "3",
+      "startedAt": "2026-04-28 13:25:13",
+      "endedAt": "2026-04-28 13:29:51",
+      "turn_count": "2"
+    },
+    {
+      "id": "1530001",
+      "playerName": "张久峰",
+      "totalScore": "83",
+      "status": "win",
+      "convertedCount": "10",
+      "totalRounds": "4",
+      "startedAt": "2026-04-28 13:21:33",
+      "endedAt": "2026-04-28 13:24:46",
+      "turn_count": "3"
+    },
+    {
+      "id": "1500003",
+      "playerName": "张久峰",
+      "totalScore": "79",
+      "status": "win",
+      "convertedCount": "10",
+      "totalRounds": "4",
+      "startedAt": "2026-04-28 12:57:19",
+      "endedAt": "2026-04-28 12:59:13",
+      "turn_count": "3"
+    },
+    {
+      "id": "1500002",
+      "playerName": "小跑",
+      "totalScore": "40",
+      "status": "fail",
+      "convertedCount": "5",
+      "totalRounds": "3",
+      "startedAt": "2026-04-28 12:42:34",
+      "endedAt": "2026-04-28 12:51:17",
+      "turn_count": "5"
+    },
+    {
+      "id": "1500001",
+      "playerName": "小跑",
+      "totalScore": "0",
+      "status": "active",
+      "convertedCount": "0",
+      "totalRounds": "0",
+      "startedAt": "2026-04-28 12:35:17",
+      "endedAt": "NULL",
+      "turn_count": "1"
+    },
+    {
+      "id": "1470001",
+      "playerName": "明年",
+      "totalScore": "79",
+      "status": "win",
+      "convertedCount": "10",
+      "totalRounds": "3",
+      "startedAt": "2026-04-28 12:02:12",
+      "endedAt": "2026-04-28 12:29:30",
+      "turn_count": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tplayerName\ttotalScore\tstatus\tconvertedCount\ttotalRounds\tstartedAt\tendedAt\tturn_count\n1590001\t大王\t0\tactive\t0\t0\t2026-05-09 10:06:19\tNULL\t2\n1560001\tll\t0\tactive\t0\t0\t2026-04-29 03:36:37\tNULL\t15\n1530004\t李四\t55\twin\t7\t27\t2026-04-28 14:04:47\t2026-04-28 14:32:03\t26\n1530003\t李四\t33\tfail\t5\t28\t2026-04-28 13:28:21\t2026-04-28 14:03:12\t27\n1530002\t张久峰\t71\twin\t10\t3\t2026-04-28 13:25:13\t2026-04-28 13:29:51\t2\n1530001\t张久峰\t83\twin\t10\t4\t2026-04-28 13:21:33\t2026-04-28 13:24:46\t3\n1500003\t张久峰\t79\twin\t10\t4\t2026-04-28 12:57:19\t2026-04-28 12:59:13\t3\n1500002\t小跑\t40\tfail\t5\t3\t2026-04-28 12:42:34\t2026-04-28 12:51:17\t5\n1500001\t小跑\t0\tactive\t0\t0\t2026-04-28 12:35:17\tNULL\t1\n1470001\t明年\t79\twin\t10\t3\t2026-04-28 12:02:12\t2026-04-28 12:29:30\t3\n",
+  "stderr": "",
+  "execution_time_ms": 1722
+}

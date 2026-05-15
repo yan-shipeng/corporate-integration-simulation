@@ -622,3 +622,12 @@
 
 ## Phase 109: Final Round Special Effect- [x] When weeksLeft === 0, TurnOverlay shows red BG + pulsing border + 「最终行动」 badge
 - [x] Apply same to GameTestPage.tsx
+
+## Phase 110: English Version (/en routes)
+- [x] Create English game engine (game-engine-en.html) with translated PEOPLE, ROLES, ACTIONS, STATUS_LABELS
+- [x] Add en_game_sessions and en_game_turns DB tables
+- [x] Add English tRPC procedures (enGame.startSession, enGame.saveTurn, enGame.endSession, enLeaderboard.list)
+- [x] Create EnHome.tsx (/en landing page)
+- [x] Create EnGamePage.tsx (/en/game)
+- [x] Create EnLeaderboardPage.tsx (/en/leaderboard)
+- [x] Register /en routes in App.tsx
