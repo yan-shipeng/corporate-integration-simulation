@@ -320,7 +320,7 @@
     .mech-details .mech-body ul{margin:4px 0 8px 20px;padding:0}
     .mech-details .mech-body li{margin:2px 0}
 
-    /* Turn log page */
+    /* Action log page */
     .log-list{display:grid;gap:14px}
     .round-card{padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--surface2)}
     .round-card h4{margin:0 0 8px;font-size:16px}
@@ -458,7 +458,7 @@
   <div class="tabs" id="tabsBar" style="display:none">
     <button class="btn active" data-screen="network">Social Network</button>
     <button class="btn" data-screen="decision">Make Decision</button>
-    <button class="btn" data-screen="log">Turn Log</button>
+    <button class="btn" data-screen="log">Action Log</button>
     <button class="btn" id="endingTabBtn" style="display:none;background:#fffbf0;border-color:#e8c884;color:#9a6510;font-weight:600">📜 View Ending</button>
   </div>
 
@@ -1156,7 +1156,7 @@
 
     <section class="screen" id="screen-log">
       <div class="panel section">
-        <h2>Turn Log</h2>
+        <h2>Action Log</h2>
         <div class="small muted">Review each round's decisions, targets, key results, and KPI trends. Use for post-game discussion.</div>
 
         <div class="trend-wrap" id="trendWrap"></div>
@@ -1174,7 +1174,7 @@
       <div class="panel section" style="margin-top:18px;border-left:4px solid var(--warn)">
         <div class="small" style="padding:4px 0;line-height:1.7;color:#7a5810"><strong>💡 Tip:</strong> Before restarting, complete these 3 steps — ① Review the debrief above ② Click "📊 View Round Log" to trace your decisions ③ Click "📥 Export PDF" to save this session.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-          <button class="btn btn-primary" id="endingViewLogBtn" style="flex:1;min-width:180px">📊 ViewRoundLog</button>
+          <button class="btn btn-primary" id="endingViewLogBtn" style="flex:1;min-width:180px">📊 View Action Log</button>
           <button class="btn" id="endingExportBtn" style="flex:1;min-width:180px;background:var(--success);color:#fff;border-color:var(--success)">📥 Export PDF</button>
         </div>
         <button class="btn" id="endingRestartBtn" style="margin-top:10px;width:100%;background:#f3f4f6;color:var(--muted);border:1px dashed var(--border);font-size:13px;padding:8px">🔄 Restart</button>
@@ -1191,13 +1191,13 @@
     <div class="modal-card">
       <div id="impactBody"></div>
       <div id="modalActions" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn" id="viewLogBtn" style="flex:1">ViewRoundLog</button>
+        <button class="btn" id="viewLogBtn" style="flex:1">View Action Log</button>
         <button class="btn btn-primary" id="nextRoundBtn" style="flex:1">Enter Next Round</button>
       </div>
       <div id="modalFinalActions" style="margin-top:20px;display:none;flex-direction:column;gap:10px">
         <div class="small" style="padding:10px 12px;background:rgba(224,138,58,.1);border-left:3px solid var(--warn);border-radius:6px;color:#e0a050"><strong>💡 Tip:</strong> Before restarting, complete these 3 steps — ① Review the debrief below ② Click "📊 View Round Log" to trace your decisions ③ Click "📥 Export PDF" to save this session.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="finalViewLogBtn" style="flex:1;min-width:180px">📊 ViewRoundLog</button>
+          <button class="btn btn-primary" id="finalViewLogBtn" style="flex:1;min-width:180px">📊 View Action Log</button>
           <button class="btn" id="finalExportBtn" style="flex:1;min-width:180px;background:var(--success);color:#fff;border-color:var(--success)">📥 Export PDF</button>
         </div>
         <button class="btn" id="finalRestartBtn" style="background:rgba(255,255,255,.04);color:var(--muted);border:1px dashed var(--border);font-size:13px;padding:8px">🔄 Restart</button>
@@ -1833,7 +1833,7 @@ let currentRoleId = 'integrator';
 const ACTION_GROUPS = [
   { key:'communicate', label:'💬 Communicate', ids:['interview','email','progress','social-gathering'] },
   { key:'demonstrate', label:'🌱 Demonstrate', ids:['exemplify','success-story','pilot'] },
-  { key:'enable',      label:'🎓 Enable', ids:['external-training','internal-training'] },
+  { key:'enable',      label:'🎓 Empower', ids:['external-training','internal-training'] },
   { key:'institution', label:'🏛 Institutionalize', ids:['ceo-endorse','recognize','kpi','incentive'] }
 ];
 
@@ -1961,11 +1961,11 @@ function isBridge(id){ const p=state.people[id]; return p && p.ties && p.ties.le
 const ACTION_TYPE_ALIASES = {
   'demonstrate': 'Demonstrate',
   'communicate': 'Communicate',
-  'enable': 'Enable',
+  'enable': 'Empower',
   'institutionalize': 'Institutionalize',
   'demonstrate': 'Demonstrate',
   'communicate': 'Communicate',
-  'enable': 'Enable',
+  'enable': 'Empower',
   'institution': 'Institutionalize',
 };
 function preferenceMultiplier(personId, actionType){
@@ -3432,7 +3432,7 @@ function updateRunButton(){
   // v15：同步更新决策预览
   const selA = state.selectedAction!=null ? ACTIONS[state.selectedAction] : null;
   renderDecisionPreview(selA, state.selectedTargets);
-  if(state.ended){ btn.disabled=true; hint.textContent='This game has Ended, please ViewRoundLog or Start again.'; hint.className='hint-strip muted'; return; }
+  if(state.ended){ btn.disabled=true; hint.textContent='This game has Ended, please View Action Log or Start again.'; hint.className='hint-strip muted'; return; }
   if(state.selectedAction===null){ btn.disabled=true; hint.textContent='Please select an action first.'; hint.className='hint-strip muted'; return; }
   const a=ACTIONS[state.selectedAction];
   const wait=Math.max(0,(state.nextAvailable[a.id]||state.round)-state.round);
