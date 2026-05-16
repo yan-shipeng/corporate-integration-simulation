@@ -29,7 +29,7 @@ export default function EnHome() {
       <header className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-white/50">
           <Globe className="w-4 h-4 text-emerald-400" />
-          <span className="text-emerald-400 font-medium">EMBA Change Management Simulation</span>
+          <span className="text-emerald-400 font-medium">Strategy Implementation Simulation</span>
           <span>·</span>
           <span>Multiplayer Edition</span>
         </div>
@@ -46,7 +46,7 @@ export default function EnHome() {
         {/* Badge */}
         <Badge className="mb-8 bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs px-4 py-1.5 rounded-full">
           <Zap className="w-3 h-3 mr-1.5" />
-          Multinational Corporate Integration Challenge
+          Strategy Implementation · Multiplayer Edition
         </Badge>
 
         {/* Title */}
@@ -58,8 +58,8 @@ export default function EnHome() {
         </h1>
 
         <p className="text-white/50 text-lg max-w-xl mb-12 leading-relaxed">
-          You are the newly appointed Chief Integration Officer of a multinational corporation.
-          Win over 10 key stakeholders within 48 weeks to drive successful organizational change.
+          You are the Integration Lead sent by HQ to oversee an overseas acquisition.
+          Within <strong className="text-white/80">60 resource units</strong>, convert all <strong className="text-white/80">12 key stakeholders</strong> to drive successful organizational change — and compare your strategy with peers on the leaderboard.
         </p>
 
         {/* Stats */}
