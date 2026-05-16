@@ -125,9 +125,6 @@ export default function EnHome() {
             <Users className="w-3.5 h-3.5" />
             View Rankings
           </Link>
-          <Link href="/" className="hover:text-white/70 transition-colors">
-            中文版 →
-          </Link>
         </div>
       </main>
 
