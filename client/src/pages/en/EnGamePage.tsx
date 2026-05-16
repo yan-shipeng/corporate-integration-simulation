@@ -433,7 +433,15 @@ function normaliseMoverForSave(m: unknown): { id: string; name: string; before: 
 
 // ─── Main EnGamePage component ────────────────────────────────────────────────
 export default function EnGamePage() {
-  const playerName = localStorage.getItem(EN_PLAYER_NAME_KEY) ?? "";
+  // Read player name from URL param first (set by EnHome on navigation), then localStorage
+  const playerName = (() => {
+    const urlParam = new URLSearchParams(window.location.search).get("player");
+    if (urlParam) {
+      try { localStorage.setItem(EN_PLAYER_NAME_KEY, urlParam); } catch { /* ignore */ }
+      return urlParam;
+    }
+    return localStorage.getItem(EN_PLAYER_NAME_KEY) ?? "";
+  })();
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [gameResult, setGameResultState] = useState<GameResult | null>(() => {
