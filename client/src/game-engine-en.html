@@ -3031,6 +3031,25 @@ function drawNetwork(svgId){
     text.setAttribute('text-anchor','middle');
     text.textContent=p.name;
     nodeG.appendChild(text);
+    // Acceptance score mini-label below name (hidden for PM)
+    if(id!=='pm'){
+      const scoreText=document.createElementNS('http://www.w3.org/2000/svg','text');
+      scoreText.setAttribute('class','score-label');
+      scoreText.setAttribute('x',p.x);
+      scoreText.setAttribute('y',p.y+57);
+      scoreText.setAttribute('text-anchor','middle');
+      scoreText.setAttribute('font-size','10');
+      scoreText.setAttribute('font-weight','600');
+      scoreText.setAttribute('fill','rgba(13,209,180,0.75)');
+      scoreText.setAttribute('pointer-events','none');
+      scoreText.setAttribute('user-select','none');
+      scoreText.setAttribute('paint-order','stroke');
+      scoreText.setAttribute('stroke','#06111a');
+      scoreText.setAttribute('stroke-width','2.5');
+      scoreText.setAttribute('stroke-linejoin','round');
+      scoreText.textContent=`Acc ${p.score}`;
+      nodeG.appendChild(scoreText);
+    }
 
     // 拖拽（带阈值）+ 触摸
     const beginDrag=(clientX, clientY)=>{
@@ -3129,6 +3148,8 @@ function updateNodePosition(svgId, personId){
     if(pmText){ pmText.setAttribute('x',p.x); pmText.setAttribute('y',p.y+5); }
     if(statusRing){ statusRing.setAttribute('cx',p.x+17); statusRing.setAttribute('cy',p.y+17); }
     if(statusGlyph){ statusGlyph.setAttribute('x',p.x+17); statusGlyph.setAttribute('y',p.y+17); }
+    const scoreLabel = nodeG.querySelector('text.score-label');
+    if(scoreLabel){ scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57); scoreLabel.textContent=`Acc ${p.score}`; }
   }
   // 更新关联边
   p.ties.forEach(t=>{

@@ -1449,7 +1449,7 @@ const ACTIONS=[
         : {story:'这一轮的访谈几乎没有新信息。', details:[]};
       res.details.unshift(
         `⚠️ 重复访谈反感：${overused.map(i=>state.people[i].name).join('、')} 已被你访谈 ≥ 3 次。他们开始觉得你「只会聊，不落地」。`,
-        `影响：${hitNames.length ? hitNames.join('、') + ' 分数 -4；' : ''}你的可信度 -1。`
+        `影响：${hitNames.length ? hitNames.join('、') + ' 接受度 -4；' : ''}你的可信度 -1。`
       );
       // Phase 17: also inject discovery highlight in overused path
       if (_newlyDiscovered.length > 0) {
@@ -1555,7 +1555,7 @@ const ACTIONS=[
         story:'你讲了一个「成功案例」，但在座同事内心OS：「你自己那里连一个真正打通的案例都没有，这是从PPT拷的吧？」',
         details:[
           '⚠️ 急于讲叙事但缺乏本土证据：听众感到被愚弄，反抗阻力 +1。',
-          hitNames.length ? `👥 反感：${hitNames.join('、')} 分数 -8（觉得你在画大饼）。` : '',
+          hitNames.length ? `👥 反感：${hitNames.join('、')} 接受度 -8（觉得你在画大饼）。` : '',
           '💡 建议先用「小范围试点」或「上手培训」做出至少 1 个本土案例再讲。'
         ].filter(Boolean),
         fail:true
@@ -1600,7 +1600,7 @@ const ACTIONS=[
       const det = [
         `⚠️ 进展报告反噬：满屏「变革正在发生」的PPT背后，真正落地的项目屈指可数。`,
         `可信度 -2，反抗阻力 +2（怨言在底层制造部门串联）。`,
-        doersHit.length ? `👷 实干派质疑：${doersHit.join('、')} 心理距离拉大（分数 -5）。` : `👷 实干派尚未明表态，但反馈已在私下累积。`
+        doersHit.length ? `👷 实干派质疑：${doersHit.join('、')} 心理距离拉大（接受度 -5）。` : `👷 实干派尚未明表态，但反馈已在私下累积。`
       ];
       return {story:'你发布了一份「变革成果阶段汇报」，但车间组长在企业微信群里读完只回了一个「?」——没人知道文章里的成果是啥。', details:det};
     }
@@ -1636,7 +1636,7 @@ const ACTIONS=[
         details:[
           `❌ 表彰严重失当：${p.name}目前仍处于「${statusText(p.status)}」状态，尚未形成任何示范效应。反抗阻力 +2。`,
           `📚 管理学原理：${factionCtx}`,
-          hitNames.length ? `👥 全组织质疑：${hitNames.join('、')} 对你的判断力产生怀疑（分数 -8）。` : '',
+          hitNames.length ? `👥 全组织质疑：${hitNames.join('、')} 对你的判断力产生怀疑（接受度 -8）。` : '',
           `💡 建议：目标必须至少达到「参与」状态（score ≥ 60）才能进行公开认可，才能形成真正的榜样效应。`
         ].filter(Boolean),fail:true};
     }
@@ -1649,7 +1649,7 @@ const ACTIONS=[
       state.pressure = Math.min(10, state.pressure + 1);
       return {story:`你公开表彰了${p.name}，但${p.name}还没有足够的成果——这次表彰让他/她感到被「捧杀」，同事也开始质疑你的判断。`,
         details:[
-          `❌ 表彰时机失当：${p.name}当前处于「${statusText(p.status)}」状态，尚未有足够的成果支撑公开认可。${p.name}感到被孤立（分数 -12），反抗阻力 +1。`,
+          `❌ 表彰时机失当：${p.name}当前处于「${statusText(p.status)}」状态，尚未有足够的成果支撑公开认可。${p.name}感到被孤立（接受度 -12），反抗阻力 +1。`,
           `📚 管理学原理：过早的公开表彰会让被表彰者在同事中显得「被特殊对待」，反而引发同伴压力和孤立效应（Peer Isolation Effect）。`,
           `💡 建议：等待${p.name}进入「参与」状态（score ≥ 60）后再进行公开认可，效果才能真正放大。`
         ],fail:true};
@@ -1690,7 +1690,7 @@ const ACTIONS=[
         story:'你在全体会上宣布了硬性KPI与时限，但台下的议论是「你自己还没打通一个案例，凭什么压我们」。',
         details:[
           '⚠️ 信用未立而先推KPI：实干派怒火起来。可信度 -2，反抗阻力 +2。',
-          hit.length ? `👥 反弹：${hit.join('、')} 分数 -6（感到被“指标绱架”）。` : '👥 所有实干派已表态或已转化，反弹较小。',
+          hit.length ? `👥 反弹：${hit.join('、')} 接受度 -6（感到被“指标绱架”）。` : '👥 所有实干派已表态或已转化，反弹较小。',
           '💡 建议：先通过试点/培训达到 3 以上转化，或可信度提升到 8+ 再推硬性KPI。'
         ]
       };
@@ -3060,6 +3060,25 @@ function drawNetwork(svgId){
     text.setAttribute('text-anchor','middle');
     text.textContent=p.name;
     nodeG.appendChild(text);
+    // 接受度数值小标签（PM 节点不显示）
+    if(id!=='pm'){
+      const scoreText=document.createElementNS('http://www.w3.org/2000/svg','text');
+      scoreText.setAttribute('class','score-label');
+      scoreText.setAttribute('x',p.x);
+      scoreText.setAttribute('y',p.y+57);
+      scoreText.setAttribute('text-anchor','middle');
+      scoreText.setAttribute('font-size','10');
+      scoreText.setAttribute('font-weight','600');
+      scoreText.setAttribute('fill','rgba(13,209,180,0.75)');
+      scoreText.setAttribute('pointer-events','none');
+      scoreText.setAttribute('user-select','none');
+      scoreText.setAttribute('paint-order','stroke');
+      scoreText.setAttribute('stroke','#06111a');
+      scoreText.setAttribute('stroke-width','2.5');
+      scoreText.setAttribute('stroke-linejoin','round');
+      scoreText.textContent=`接受度 ${p.score}`;
+      nodeG.appendChild(scoreText);
+    }
 
     // 拖拽（带阈值）+ 触摸
     const beginDrag=(clientX, clientY)=>{
@@ -3158,6 +3177,8 @@ function updateNodePosition(svgId, personId){
     if(pmText){ pmText.setAttribute('x',p.x); pmText.setAttribute('y',p.y+5); }
     if(statusRing){ statusRing.setAttribute('cx',p.x+17); statusRing.setAttribute('cy',p.y+17); }
     if(statusGlyph){ statusGlyph.setAttribute('x',p.x+17); statusGlyph.setAttribute('y',p.y+17); }
+    const scoreLabel = nodeG.querySelector('text.score-label');
+    if(scoreLabel){ scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57); scoreLabel.textContent=`接受度 ${p.score}`; }
   }
   // 更新关联边
   p.ties.forEach(t=>{
