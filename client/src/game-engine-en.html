@@ -1328,7 +1328,7 @@ const ACTIONS=[
     if(state.lastActionId === 'exemplify'){
       state.credibility = Math.max(0, state.credibility - 1);
       const r = affectAll(3, 'You lead by example again, but the organization starts to murmur, "Is anyone making real progress besides the film crew?"', 'demonstrate');
-      r.details.unshift('⚠️ Repeated demonstration without other substantive actions – the signal degrades into 'a show'. Credibility -1.');
+      r.details.unshift('⚠️ Repeated demonstration without other substantive actions – the signal degrades into \'a show\'. Credibility -1.');
       return r;
     }
     const convCount38 = Object.entries(state.people).filter(([id,p])=>id!=='pm' && p.status===4).length;
@@ -1359,7 +1359,7 @@ const ACTIONS=[
       const r = affectAll(2, 'You ask headquarters to endorse again, but this time the signal strength is significantly attenuated.', 'institutionalize');
       r.details.unshift(
         `⚠️ Political Capital Overdraft: This is your ${useN}th time asking the CEO for endorsement. The organization is starting to murmur, "Can't they handle it themselves?"`,
-        `Credibility -2，Resistance +1。` + (ceoHit.length ? `CEO Score -8 (frequently "used").` : 'CEO's attitude has cooled.')
+        `Credibility -2，Resistance +1。` + (ceoHit.length ? `CEO Score -8 (frequently "used").` : 'CEO\'s attitude has cooled.')
       );
       return r;
     }
@@ -1515,11 +1515,11 @@ const ACTIONS=[
       });
       state.pressure = Math.min(10, state.pressure + 1);
       return {
-        story:'You told a 'Success story', but colleagues inwardly thought: 'You don't even have a single truly successful case yourself, is this copied from a PPT?'',
+        story:'You told a \'Success story\', but colleagues inwardly thought: \'You don\'t even have a single truly successful case yourself, is this copied from a PPT?\'',
         details:[
           '⚠️ Eager to tell a narrative but lacking local evidence: listeners feel fooled, Resistance +1.',
           hitNames.length ? `👥 Dislike: ${hitNames.join('、')} Score -8 (they think you're making empty promises).` : '',
-          '💡 Suggestion: First create at least 1 local case through 'small-scale pilot' or 'hands-on training' before presenting.'
+          '💡 Suggestion: First create at least 1 local case through \'small-scale pilot\' or \'hands-on training\' before presenting.'
         ].filter(Boolean),
         fail:true
       };
@@ -1565,13 +1565,13 @@ const ACTIONS=[
         `Credibility -2, Resistance +2 (Grumbling spreads among the grassroots manufacturing department).`,
         doersHit.length ? `👷 Doers' Doubt: ${doersHit.join('、')} psychological distance widens (Score -5).` : `👷 Doers have not yet openly expressed their stance, but feedback is accumulating privately.`
       ];
-      return {story:'You released a 'Change Progress Report', but the workshop team leader only replied with a '?' in the WeChat group after reading it – no one knew what the achievements in the article were.', details:det};
+      return {story:'You released a \'Change Progress Report\', but the workshop team leader only replied with a \'?\' in the WeChat group after reading it – no one knew what the achievements in the article were.', details:det};
     }
     // "Not enough conversion progress yet": half effect, small Credibility penalty
     if(convCount < 3){
       state.credibility = Math.max(0, state.credibility - 1);
       const r = affectNonAdopters(4,'The report dispelled some doubts, but the metrics remained flat.','communicate');
-      r.details.unshift('⚠️ Limited material: Credibility -1 (observers believe 'it's not presentable').');
+      r.details.unshift('⚠️ Limited material: Credibility -1 (observers believe \'it\'s not presentable\').');
       return r;
     }
     // Normal scenario: real progress, positive effect
@@ -1582,9 +1582,9 @@ const ACTIONS=[
 
     // Failed condition A: completely uncommitted (status === 0) — worst case, whole org sees it as going through the motions
     if(p.status === 0){
-      const factionCtx = p.faction==='Local' ? 'In local European culture, publicly commending someone who has taken no action is seen as 'going through the motions,' and collective trust within the organization will decline.' :
+      const factionCtx = p.faction==='Local' ? 'In local European culture, publicly commending someone who has taken no action is seen as \'going through the motions,\' and collective trust within the organization will decline.' :
                          p.faction==='External' ? 'External stakeholders judge recognition more harshly — praise without results is seen as a PR stunt and spreads a negative impression externally.' :
-                         'Individuals with headquarters backgrounds have higher expectations for commendation; commending someone who has done nothing will be seen as 'seeking attention,' damaging the credibility of the entire change project.';
+                         'Individuals with headquarters backgrounds have higher expectations for commendation; commending someone who has done nothing will be seen as \'seeking attention,\' damaging the credibility of the entire change project.';
       // 全图未转化者集体质疑，Score下降
       const hitNames = [];
       Object.entries(state.people).forEach(([id, q])=>{
@@ -1650,7 +1650,7 @@ const ACTIONS=[
         }
       });
       return {
-        story:'You announced hard KPIs and deadlines at the all-hands meeting, but the murmurs from the audience were, 'You haven't even completed one case yourself, why are you pressuring us?'',
+        story:'You announced hard KPIs and deadlines at the all-hands meeting, but the murmurs from the audience were, \'You haven\'t even completed one case yourself, why are you pressuring us?\'',
         details:[
           '⚠️ Pushing KPIs before establishing credibility: Doers are enraged. Credibility -2, Resistance +2.',
           hit.length ? `👥 Backlash: ${hit.join(', ')} Score -6 (feel 'manipulated by metrics').` : '👥 All pragmatists have taken a stance or converted — backlash is minimal.',
@@ -1730,7 +1730,7 @@ const ACTIONS=[
     // 副作用：过度使用损害Credibility和专业形象
     if(veryOverused){
       state.credibility = Math.max(0, state.credibility - 2);
-      details.push('⚠️ Severely overdone: This is your ' + state.socialGatheringCount + 'th gathering. Everyone Starts privately discussing that you only 'play politics' and don't do real work. Credibility -2, effect significantly reduced.');
+      details.push('⚠️ Severely overdone: This is your ' + state.socialGatheringCount + 'th gathering. Everyone Starts privately discussing that you only \'play politics\' and don\'t do real work. Credibility -2, effect significantly reduced.');
     } else if(overused){
       state.credibility = Math.max(0, state.credibility - 1);
       details.push('⚠️ Gatherings too frequent (' + state.socialGatheringCount + 'th time): Some people Start to feel you are deliberately trying to win them over, effect discounted. Credibility -1.');
@@ -1756,7 +1756,7 @@ const ACTIONS=[
       if(neighborBoostNames.length > 0){
         details.push(`✨ Word-of-mouth from converted colleagues spreads: ${neighborBoostNames.join('、')} heard about the atmosphere of the gathering, and their attitude towards change improved.`);
       } else {
-        details.push('✨ Transformed colleagues participated in the gathering, enhancing the atmosphere's contagiousness.');
+        details.push('✨ Transformed colleagues participated in the gathering, enhancing the atmosphere\'s contagiousness.');
       }
     }
 
@@ -2097,7 +2097,7 @@ function checkCeoPmTrust(){
       // Will be shown in next turn's side effects
       if(!state.lastImpact) return;
       if(state.lastImpact.sideEffects){
-        state.lastImpact.sideEffects.push({kind:'neg', text:'⚠️ CFO influence rises: Headquarters CFO Starts conveying doubts about your integration Progress to the CEO, and the CEO's trust in you shows cracks. Can be repaired through in-depth communication with the CEO.'});
+        state.lastImpact.sideEffects.push({kind:'neg', text:'⚠️ CFO influence rises: Headquarters CFO Starts conveying doubts about your integration Progress to the CEO, and the CEO\'s trust in you shows cracks. Can be repaired through in-depth communication with the CEO.'});
       }
     }
   }
@@ -2116,7 +2116,7 @@ function tryRestoreCeoPmTrust(actionId, targetIds){
   }
   if(!state.lastImpact) return;
   if(state.lastImpact.sideEffects){
-    state.lastImpact.sideEffects.push({kind:'pos', text:'✅ Trust repaired: Through in-depth communication, you have regained the CEO's trust, and your Relationships have returned to normal.'});
+    state.lastImpact.sideEffects.push({kind:'pos', text:'✅ Trust repaired: Through in-depth communication, you have regained the CEO\'s trust, and your Relationships have returned to normal.'});
   }
 }
 
@@ -2173,7 +2173,7 @@ function affectAll(amount, story, actionType){
     const r = applyGain(id, amount, actionType, 'broad');
     if(r.newlyConverted) newlyConverted.push(id);
   });
-  const det=['This is an organization-wide action, with broad coverage but limited persuasiveness for deep observers, and it's difficult to achieve the final leap from 'participation → conversion.''];
+  const det=['This is an organization-wide action, with broad coverage but limited persuasiveness for deep observers, and it\'s difficult to achieve the final leap from \'participation → conversion.\''];
   handleConversions(newlyConverted, det, actionType);
   return {story, details:det};
 }
@@ -2558,7 +2558,7 @@ function applyConsequences(action, impact){
     if(salesP && salesP.status <= 1){
       state._customerPressureTriggered = true;
       state.pressure = Math.min(state.pressure + 2, 15);
-      notes.push('📢 Major Client Complaint: The Sales Director's continued resistance to the integration direction leads to major clients questioning the progress of the change. Organizational Resistance increases.');
+      notes.push('📢 Major Client Complaint: The Sales Director\'s continued resistance to the integration direction leads to major clients questioning the progress of the change. Organizational Resistance increases.');
     }
   }
   // Phase 56: 运营正向事件——运营主管Status良好时，主动协调降低组织Resistance
@@ -2774,7 +2774,7 @@ function renderDetail(id, boxId){
     </div>
   </div>
   ${bridgeNote?`<div style="margin-top:8px">${bridgeNote}</div>`:''}
-  <div class="small" style="margin-top:10px;line-height:1.6">${resistorDiscovered ? p.desc : 'The true stance and motives of this character are not yet clear. Please conduct a 'Private Interview' with their associated characters first to gain more information.'}</div>
+  <div class="small" style="margin-top:10px;line-height:1.6">${resistorDiscovered ? p.desc : 'The true stance and motives of this character are not yet clear. Please conduct a \'Private Interview\' with their associated characters first to gain more information.'}</div>
   <div class="small" style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid ${factionColor};border:1px solid rgba(255,255,255,.08);border-left:3px solid ${factionColor}">
     <strong style="color:${factionColor}">📊 Key Information</strong><br/>
     • CurrentScore：${p.score}<br/>
@@ -3267,7 +3267,7 @@ function buildActionCard(a, idx){
           return allTies.some(t => state.revealed[t]); // connected person interviewed
         })();
         const confrontLocked = (a.id === 'confront' && !isDiscovered);
-        const lockedMark = confrontLocked ? '<span title="This person's Resistance Role identity has not been discovered yet, please interview related characters first" style="color:var(--muted);font-weight:700">🔒</span>' : '';
+        const lockedMark = confrontLocked ? '<span title="This person\'s Resistance Role identity has not been discovered yet, please interview related characters first" style="color:var(--muted);font-weight:700">🔒</span>' : '';
 
         const disabledAttr = (confrontRisk || recogRisk || confrontLocked) ? 'data-risk="1"' : '';
         const riskStyle = (confrontRisk || recogRisk) ? 'style="opacity:0.55;border-color:var(--danger)"' : confrontLocked ? 'style="opacity:0.35;filter:grayscale(0.8)"' : '';
@@ -3452,7 +3452,7 @@ function updateRunButton(){
   if(!credOk) warnings.push(`⚠️ Insufficient Credibility (requires ${a.reqCred}, have ${state.credibility}) – Force Execute will increase Resistance +${Math.min(3, a.reqCred-state.credibility)}`);
   if(problems.length){ hint.textContent = h + ' · ' + problems.join('；'); hint.className='hint-strip warn'; }
   else if(warnings.length){ hint.textContent = h + ' · ' + warnings.join('；') + '，ConfirmForce Execute'; hint.className='hint-strip warn'; }
-  else { hint.textContent = h + ' · Click 'Execute Round Decision''; hint.className='hint-strip'; }
+  else { hint.textContent = h + ' · Click \'Execute Round Decision\''; hint.className='hint-strip'; }
 }
 
 /* =========================================================
@@ -3466,9 +3466,7 @@ function endingNarratives(type){
     return {
       cls:'win', title:'Great Success · Change Hourglass',
       story:`After ${state.round-1} Rounds and consuming ${weeksUsed} Resources, you pushed the Conversion Rate to ${finalRate}%. The entire organization has fully embraced the new processes and values – not just consistency at the execution level, but genuine conviction from middle and senior management. When the HQ CEO walked into the board meeting with your review materials, he brought not only a replicable integration methodology, but also a transferable cultural legacy.`,
-      teach:'▶ Cultural Layer: The exemplars have become communicators of new values, and resistance from old power structures is no longer the main obstacle. How did you achieve a shift from mere "acceptance" to "conviction"?
-▶ Systemic Layer: Did you establish self-reinforcing feedback mechanisms early on, making new processes irreversible organizational habits?
-▶ Individual Layer: Did you sufficiently invest in the personal credibility of bridge characters (Regional GM/HR) to make them true drivers of change?',
+      teach:'▶ Cultural Layer: The exemplars have become communicators of new values, and resistance from old power structures is no longer the main obstacle. How did you achieve a shift from mere "acceptance" to "conviction"?\n▶ Systemic Layer: Did you establish self-reinforcing feedback mechanisms early on, making new processes irreversible organizational habits?\n▶ Individual Layer: Did you sufficiently invest in the personal credibility of bridge characters (Regional GM/HR) to make them true drivers of change?',
       realWorld:'▶ <strong>Midea·KUKA (2016)</strong>: Retained original team, avoided mass secondments, achieved deep integration through performance and cultural patience.\n▶ <strong>Geely·Volvo (2010-2020)</strong>: "Two Brands · One Group" isolation design — Volvo became profitable and Geely benefited from EV transformation a decade later.\n▶ <strong>CATL·Germany Plant (2019-2024)</strong>: Achieved a three-way balance of efficiency, ESG, and compliance through centralized technology empowerment combined with localized management.'
     };
   }
@@ -3476,9 +3474,7 @@ function endingNarratives(type){
     return {
       cls:'win', title:'Early Success · Change Takes Root',
       story:`In just ${weeksUsed} Resources and ${state.round-1} rounds, you raised the Conversion Rate to ${finalRate}%. In the hallway outside the meeting room, the Factory General Manager proactively discussed the Next standardization plan with the Regional GM – a true sign of "self-driven" initiative. When the HQ CEO walked into the board meeting with your review materials, for the first time, he brought not a sense of urgency, but a "replicable integration methodology."`,
-      teach:'▶ Cultural Layer: In a cultural boundary where direct orders are impossible, how did the demonstrator replace 'Import Template' as the source of legitimacy?
-▶ Institutional Layer: In which Round did you use small-scale pilots/training instead of hard KPIs? Was the timing of institutions and narratives key to early victories?
-▶ Individual Layer: In which Round did the demonstrator's diffusion effect become exponential? Was the personal credibility of bridge figures (Regional GM/HR) fully invested?',
+      teach:'▶ Cultural Layer: In a cultural boundary where direct orders are impossible, how did the demonstrator replace \'Import Template\' as the source of legitimacy?\n▶ Institutional Layer: In which Round did you use small-scale pilots/training instead of hard KPIs? Was the timing of institutions and narratives key to early victories?\n▶ Individual Layer: In which Round did the demonstrator\'s diffusion effect become exponential? Was the personal credibility of bridge figures (Regional GM/HR) fully invested?',
       realWorld:'▶ <strong>Midea·KUKA (2016)</strong>: Retained original team, avoided mass secondments, achieved relatively successful integration.\n▶ <strong>Geely·Volvo (2010-2020)</strong>: "Two Brands · One Group" isolation design — Volvo became profitable a decade later.\n▶ <strong>CATL·Germany Plant (2019-2024)</strong>: Achieved ESG and compliance balance through partial localized management plus HQ technology empowerment.'
     };
   }
@@ -3498,16 +3494,14 @@ function endingNarratives(type){
     if (finalCred >= 7 && state.pressure <= 2) {
       verdict = 'The grassroots show good willingness to follow up. Although some former executives are still observing, as long as the current trust rhythm is maintained, those already converted will soon form a self-reinforcing normative front.';
     } else if (finalCred >= 5 || state.pressure <= 3) {
-      verdict = 'The grassroots have initially adapted to the new process, but more see it as 'headquarters' requirement' rather than internalized habit. Some former executives still have reservations privately.';
+      verdict = 'The grassroots have initially adapted to the new process, but more see it as \'headquarters\' requirement\' rather than internalized habit. Some former executives still have reservations privately.';
     } else {
-      verdict = 'You achieved the numerical target with strong push at the last minute, but also overdrawn the organization's trust balance. The current situation is very delicate; former executives and grassroots are watching your next move.';
+      verdict = 'You achieved the numerical target with strong push at the last minute, but also overdrawn the organization\'s trust balance. The current situation is very delicate; former executives and grassroots are watching your next move.';
     }
     return {
       cls:'pass', title:'Resources Depleted · Debrief',
       story:`After ${state.round-1} Rounds and consuming all ${weeksUsed} Resources, you pushed the Conversion Rate to ${finalRate}%. ${credPhrase}, ${pressPhrase}. ${verdict}. This achievement has been included in the report, and you have successfully broken through the old system. The real challenge has just begun: how to transform this 50% conversion into an irreversible organizational habit?`,
-      teach:'▶ Cultural Layer: What else is needed for the leap from 'passive acceptance' to 'internalized identification'? Among your current converts, who can become the next spark?
-▶ Institutional Layer: Looking back at the whole process, did the imposition of KPIs and Resistance precede the accumulation of trust? What hidden dangers did this leave for subsequent management?
-▶ Individual Layer: If you were to replay, would you be willing to trade early Progress for a more solid foundation of trust?',
+      teach:'▶ Cultural Layer: What else is needed for the leap from \'passive acceptance\' to \'internalized identification\'? Among your current converts, who can become the next spark?\n▶ Institutional Layer: Looking back at the whole process, did the imposition of KPIs and Resistance precede the accumulation of trust? What hidden dangers did this leave for subsequent management?\n▶ Individual Layer: If you were to replay, would you be willing to trade early Progress for a more solid foundation of trust?',
       realWorld:'▶ <strong>Lenovo·IBM PC (2005)</strong>: Achieved phased business integration in the first three years, then spent years achieving deep cultural integration by bringing in executives familiar with both cultures.\n▶ <strong>TikTok·Global Governance (2020-)</strong>: Quickly met compliance requirements through structural separation and local teams, but building genuine cross-cultural trust remains a long-term project.\n▶ <strong>CATL·Germany Plant (2019-)</strong>: Initially drove construction with hard standards, then gradually shifted to localized flexible management, seeking balance between efficiency and buy-in.'
     };
   }
@@ -3523,10 +3517,8 @@ function endingNarratives(type){
   return {
     cls:'fail', title:'Resources Depleted · Debrief',
     story:`Time ran out. ${failCause}. The Union Rep brought grievances to the campus interface, and key clients started questioning delivery stability. The CEO didn't blame you in the last meeting, but a proposal from an external consulting firm appeared on the table—meaning you've lost control.`,
-    teach:'▶ Cultural Layer: In the early stages of change, did you use 'headquarters logic' to override local norms? How did the legitimacy crisis spread from Target(s) to external nodes?
-▶ Institutional Layer: Did you use highly disruptive actions (KPIs/incentives/confrontation) too early? The results of 'dialogue first, then confrontation' and 'confrontation first, then dialogue' are completely different.
-▶ Individual Layer: Were key bridge figures (Regional GM, HR) left aside? Did you treat Resistors as 'individuals to be turned around' rather than 'sources to be listened to'?',
-    realWorld:'▶ <strong>TCL·Thomson (2004)·BenQ·Siemens Mobile (2005)</strong>: Major losses within 18 months; common symptoms were HQ KPI pressure, missing bridge figures, and alienated legitimacy nodes.\n▶ <strong>Anbang·German Airport (2017)</strong>: Sunk cost fallacy + remote HQ decision-making, pushed back by local regulators and unions.\n▶ <strong>Fosun·Overseas Subsidiaries (2022-)</strong>: Insufficient cross-cultural communication compounded by capital resistance led to employee strikes and customer loss.\n<div class="small" style="margin-top:8px;color:var(--danger);font-weight:600">⚠️ Failure is not a matter of effort — it's a matter of sequence.</div>'
+    teach:'▶ Cultural Layer: In the early stages of change, did you use \'headquarters logic\' to override local norms? How did the legitimacy crisis spread from Target(s) to external nodes?\n▶ Institutional Layer: Did you use highly disruptive actions (KPIs/incentives/confrontation) too early? The results of \'dialogue first, then confrontation\' and \'confrontation first, then dialogue\' are completely different.\n▶ Individual Layer: Were key bridge figures (Regional GM, HR) left aside? Did you treat Resistors as \'individuals to be turned around\' rather than \'sources to be listened to\'?',
+    realWorld:'▶ <strong>TCL·Thomson (2004)·BenQ·Siemens Mobile (2005)</strong>: Major losses within 18 months; common symptoms were HQ KPI pressure, missing bridge figures, and alienated legitimacy nodes.\n▶ <strong>Anbang·German Airport (2017)</strong>: Sunk cost fallacy + remote HQ decision-making, pushed back by local regulators and unions.\n▶ <strong>Fosun·Overseas Subsidiaries (2022-)</strong>: Insufficient cross-cultural communication compounded by capital resistance led to employee strikes and customer loss.\n<div class="small" style="margin-top:8px;color:var(--danger);font-weight:600">⚠️ Failure is not a matter of effort — it\'s a matter of sequence.</div>'
   };
 }
 
@@ -4929,16 +4921,10 @@ let _learnerExported = false;
 el('restartBtn').addEventListener('click', ()=>{
   // v17：顶栏重玩也添加Confirm — 对局终不友好
   if(state.ended && !_learnerExported){
-    const ok = confirm('You haven't Exported the PDF yet.
-
-Restarting will clear the current game record.
-
-OK to abandon this game and restart directly?');
+    const ok = confirm('You haven\'t Exported the PDF yet.\n\nRestarting will clear the current game record.\n\nOK to abandon this game and restart directly?');
     if(!ok) return;
   } else if(!state.ended && state.round > 1){
-    const ok = confirm('This game is in Round '+state.round+' .
-
-OK to abandon midway and restart a new game?');
+    const ok = confirm('This game is in Round '+state.round+' .\n\nOK to abandon midway and restart a new game?');
     if(!ok) return;
   }
   _learnerExported = false;
@@ -4980,11 +4966,7 @@ if(el('finalShareBtn')){
 if(el('finalRestartBtn')){
   el('finalRestartBtn').addEventListener('click', ()=>{
     if(!_learnerExported){
-      const ok = confirm('You haven't Exported the PDF yet.
-
-Restarting will clear the current game record.
-
-OK to abandon this game and restart directly?');
+      const ok = confirm('You haven\'t Exported the PDF yet.\n\nRestarting will clear the current game record.\n\nOK to abandon this game and restart directly?');
       if(!ok) return;
     }
     _learnerExported = false;  // reset for next session
@@ -5023,11 +5005,7 @@ if(el('endingShareBtn')){
 if(el('endingRestartBtn')){
   el('endingRestartBtn').addEventListener('click', ()=>{
     if(!_learnerExported){
-      const ok = confirm('You haven't Exported the PDF yet.
-
-Restarting will clear the current game record.
-
-OK to abandon this game and restart directly?');
+      const ok = confirm('You haven\'t Exported the PDF yet.\n\nRestarting will clear the current game record.\n\nOK to abandon this game and restart directly?');
       if(!ok) return;
     }
     _learnerExported = false;
