@@ -2778,7 +2778,7 @@ function renderDetail(id, boxId){
   <div class="small" style="margin-top:10px;line-height:1.6">${resistorDiscovered ? p.desc : 'The true stance and motives of this character are not yet clear. Please conduct a \'Private Interview\' with their associated characters first to gain more information.'}</div>
   <div class="small" style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid ${factionColor};border:1px solid rgba(255,255,255,.08);border-left:3px solid ${factionColor}">
     <strong style="color:${factionColor}">📊 Key Information</strong><br/>
-    • CurrentScore：${p.score}<br/>
+    • Acceptance Score: ${p.score}<br/>
     <span style="color:#0d9488">🏢 Formal Communication Links:</span>${p.ties.map(t=>state.people[t]?.name).filter(Boolean).join(', ') || '<span style="color:var(--muted)">—</span>'}<br/>
   </div>
   ${hiddenTiesSection}
@@ -3279,7 +3279,7 @@ function buildActionCard(a, idx){
         const prevThresh = thresholds[thresholds.indexOf(nextThresh)-1] || 0;
         const barPct = nextThresh > prevThresh ? Math.round((p.score - prevThresh) / (nextThresh - prevThresh) * 100) : 100;
         const barColor = p.status===4 ? 'var(--success)' : p.score >= nextThresh*0.8 ? '#f59e0b' : 'var(--primary)';
-        const scoreLabel = `${p.score}pts`;
+        const scoreLabel = `${p.score} acc`;
         const blocks = Math.round(barPct/20); // 0-5 filled blocks out of 5
         const barBlocks = '█'.repeat(blocks) + '░'.repeat(5-blocks);
         return `<button class="target ${state.selectedTargets.includes(id)?'on':''}" data-id="${id}" ${disabledAttr} ${riskStyle} onclick="event.stopPropagation();toggleTarget('${id}')">
@@ -3315,7 +3315,7 @@ function buildActionCard(a, idx){
           <span>✓ ${GLYPHS[p.status]+' '+p.name} ${soft2}${bridge2}${prefMark2}</span>
           <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">
             <span style="color:${barColor2};letter-spacing:-1px;font-size:10px">${barBlocks2}</span>
-            <span style="color:var(--text);font-weight:600">${p.score}pts</span>
+            <span style="color:var(--text);font-weight:600">${p.score} acc</span>
           </span>
         </button>`;
       }).join('')}</div></div>`;
@@ -3647,7 +3647,7 @@ function peopleRecap(){
     return `<tr><td>${p.name}</td><td>${GLYPHS[p.status]} ${statusText(p.status)}</td><td>${p.score}</td><td class="small muted">${comment}</td></tr>`;
   }).join('');
   return `<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px">
-    <thead><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">Stakeholder</th><th style="text-align:left;padding:6px">Final Status</th><th style="text-align:left;padding:6px">Score</th><th style="text-align:left;padding:6px">Review Notes</th></tr></thead>
+    <thead><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">Stakeholder</th><th style="text-align:left;padding:6px">Final Status</th><th style="text-align:left;padding:6px">Acceptance Score</th><th style="text-align:left;padding:6px">Review Notes</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
 }
@@ -4720,7 +4720,7 @@ function renderMobileListPanel(){
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <span class="status s${p.status}" style="padding:2px 8px;font-size:11px">${STATUS_LABELS[p.status]}</span>
-        <span style="font-size:11px;color:var(--muted)">${p.score}pts</span>
+        <span style="font-size:11px;color:var(--muted)">${p.score} acc</span>
       </div>
     </div>`;
   }).join('');

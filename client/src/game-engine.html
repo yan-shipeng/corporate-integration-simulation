@@ -2807,7 +2807,7 @@ function renderDetail(id, boxId){
   <div class="small" style="margin-top:10px;line-height:1.6">${resistorDiscovered ? p.desc : '<em style="color:var(--muted)">此人物的真实立场与动机尚未明朗。请先通过「私人访谈」了解其关联人物，才能获得更多信息。</em>'}</div>
   <div class="small" style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid ${factionColor};border:1px solid rgba(255,255,255,.08);border-left:3px solid ${factionColor}">
     <strong style="color:${factionColor}">📊 关键信息</strong><br/>
-    • 当前分数：${p.score}<br/>
+    • 接受度：${p.score}<br/>
     <span style="color:#0d9488">🏢 正式沟通关系：</span>${p.ties.map(t=>state.people[t]?.name).filter(Boolean).join('、') || '<span style="color:var(--muted)">—</span>'}<br/>
   </div>
   ${hiddenTiesSection}
@@ -3676,7 +3676,7 @@ function peopleRecap(){
     return `<tr><td>${p.name}</td><td>${GLYPHS[p.status]} ${statusText(p.status)}</td><td>${p.score}</td><td class="small muted">${comment}</td></tr>`;
   }).join('');
   return `<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px">
-    <thead><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">人物</th><th style="text-align:left;padding:6px">最终状态</th><th style="text-align:left;padding:6px">分数</th><th style="text-align:left;padding:6px">复盘点评</th></tr></thead>
+    <thead><tr style="background:var(--surface2)"><th style="text-align:left;padding:6px">人物</th><th style="text-align:left;padding:6px">最终状态</th><th style="text-align:left;padding:6px">接受度</th><th style="text-align:left;padding:6px">复盘点评</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
 }
