@@ -42,7 +42,7 @@ export default function EnLeaderboardPage() {
           <Trophy className="w-5 h-5 text-yellow-400" />
           <h1 className="font-bold text-lg">Leaderboard</h1>
           <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
-            Integration Challenge
+            Strategy Implementation Simulation
           </Badge>
         </div>
         <div className="flex items-center gap-2">

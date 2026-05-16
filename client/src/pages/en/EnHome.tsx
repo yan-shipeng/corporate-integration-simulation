@@ -1,17 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Zap, Trophy, Users, Globe } from "lucide-react";
+import EnBriefingPage from "./EnBriefingPage";
 
 const EN_PLAYER_NAME_KEY = "en-outbound-player-name";
 
+type Step = "landing" | "briefing";
+
 export default function EnHome() {
+  const [step, setStep] = useState<Step>("landing");
   const [playerName, setPlayerName] = useState(() => localStorage.getItem(EN_PLAYER_NAME_KEY) ?? "");
   const [inputName, setInputName] = useState(playerName);
-  const [, navigate] = useState<string>("");
 
   const stats = trpc.enLeaderboard.stats.useQuery();
 
@@ -20,8 +23,27 @@ export default function EnHome() {
     if (!name) return;
     localStorage.setItem(EN_PLAYER_NAME_KEY, name);
     setPlayerName(name);
-    window.location.href = `/en/game?player=${encodeURIComponent(name)}`;
+    setStep("briefing");
   };
+
+  const handleEnterGame = () => {
+    window.location.href = `/en/game?player=${encodeURIComponent(playerName)}`;
+  };
+
+  const handleSkip = () => {
+    window.location.href = `/en/game?player=${encodeURIComponent(playerName)}`;
+  };
+
+  // Show briefing step
+  if (step === "briefing") {
+    return (
+      <EnBriefingPage
+        playerName={playerName}
+        onEnterGame={handleEnterGame}
+        onSkip={handleSkip}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0f0d] text-white flex flex-col">
@@ -59,7 +81,9 @@ export default function EnHome() {
 
         <p className="text-white/50 text-lg max-w-xl mb-12 leading-relaxed">
           You are the Integration Lead sent by HQ to oversee an overseas acquisition.
-          Within <strong className="text-white/80">60 resource units</strong>, convert all <strong className="text-white/80">12 key stakeholders</strong> to drive successful organizational change — and compare your strategy with peers on the leaderboard.
+          Within <strong className="text-white/80">60 resource units</strong>, convert all{" "}
+          <strong className="text-white/80">12 key stakeholders</strong> to drive successful organizational change —
+          and compare your strategy with peers on the leaderboard.
         </p>
 
         {/* Stats */}
