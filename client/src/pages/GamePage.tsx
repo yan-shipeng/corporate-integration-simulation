@@ -101,6 +101,7 @@ interface GameResult {
   aggressiveIndex?: number;
   conservativeIndex?: number;
   narrative?: EndingNarrative | null;
+  finalPeople?: Array<{ id: string; name: string; score: number; status: number }>;
 }
 
 interface TurnData {
@@ -898,6 +899,67 @@ function LeaderboardPanel({ playerName, currentSessionId }: { playerName: string
   );
 }
 
+// ─── Peer Comparison Table ──────────────────────────────────────────────────
+function PeerComparisonTable({ finalPeople }: { finalPeople?: Array<{ id: string; name: string; score: number; status: number }> }) {
+  const { data: topData, isLoading } = trpc.leaderboard.topPeopleScores.useQuery();
+  const STATUS_LABELS = ['未触达', '已觉醒', '已关注', '已承诺', '已转化'];
+  const STATUS_COLORS = ['text-muted-foreground', 'text-blue-400', 'text-cyan-400', 'text-purple-400', 'text-green-400'];
+
+  if (isLoading) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 mr-2 animate-spin" />加载最优路径数据…</div>;
+  if (!topData || !topData.playerName) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">暂无同班数据可对比（需要至少一名同学完成游戏）</div>;
+  if (!finalPeople || finalPeople.length === 0) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">本局人物数据不可用（请完整游戏一局后查看）</div>;
+
+  const topScores = topData.peopleScores as Record<string, number>;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-lg">🏆</span>
+          <span className="font-semibold text-foreground">对比对象：{topData.playerName}</span>
+          <span className="ml-auto text-xs text-muted-foreground">综合得分 {Math.round(Number(topData.totalScore))} 分</span>
+        </div>
+        <div className="text-xs text-muted-foreground">以下对比本局各人物最终接受度与同班最高分玩家的差距，正值表示你超越了最优路径，负值表示仍有提升空间。</div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left py-2 px-3 text-muted-foreground font-medium">人物</th>
+              <th className="text-center py-2 px-3 text-muted-foreground font-medium">你的接受度</th>
+              <th className="text-center py-2 px-3 text-muted-foreground font-medium">最优路径</th>
+              <th className="text-center py-2 px-3 text-muted-foreground font-medium">差距</th>
+              <th className="text-left py-2 px-3 text-muted-foreground font-medium">你的最终状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            {finalPeople.map(p => {
+              const topScore = topScores[p.id] ?? 0;
+              const diff = p.score - topScore;
+              return (
+                <tr key={p.id} className="border-b border-border/50 hover:bg-card/30 transition-colors">
+                  <td className="py-2 px-3 font-medium text-foreground">{p.name}</td>
+                  <td className="py-2 px-3 text-center font-mono text-foreground">{p.score}</td>
+                  <td className="py-2 px-3 text-center font-mono text-muted-foreground">{topScore > 0 ? topScore : '—'}</td>
+                  <td className="py-2 px-3 text-center font-mono font-semibold">
+                    {topScore > 0 ? (
+                      <span className={diff >= 0 ? 'text-green-400' : 'text-red-400'}>
+                        {diff >= 0 ? '+' : ''}{diff}
+                      </span>
+                    ) : '—'}
+                  </td>
+                  <td className={`py-2 px-3 text-sm ${STATUS_COLORS[p.status] ?? 'text-muted-foreground'}`}>
+                    {STATUS_LABELS[p.status] ?? '未知'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 // ─── Full-screen Result Page (Plan A) ─────────────────────────────────────────
 function FullResultPage({
   result,
@@ -1005,6 +1067,10 @@ function FullResultPage({
           <TabsTrigger value="turns" className="gap-1.5 text-xs">
             <List className="w-3.5 h-3.5" />
             回合日志
+          </TabsTrigger>
+          <TabsTrigger value="peer" className="gap-1.5 text-xs">
+            <Users className="w-3.5 h-3.5" />
+            与最优对比
           </TabsTrigger>
         </TabsList>
 
@@ -1130,6 +1196,12 @@ function FullResultPage({
         <TabsContent value="turns" className="flex-1 overflow-y-auto px-6 pb-6 pt-4 data-[state=inactive]:hidden">
           <ErrorBoundary>
             <TurnLog sessionId={sessionId} playerName={playerName} fallbackTurns={result.history} />
+          </ErrorBoundary>
+        </TabsContent>
+        {/* ── Peer comparison tab ── */}
+        <TabsContent value="peer" className="flex-1 overflow-y-auto px-6 pb-6 pt-4 data-[state=inactive]:hidden">
+          <ErrorBoundary>
+            <PeerComparisonTable finalPeople={result.finalPeople} />
           </ErrorBoundary>
         </TabsContent>
       </Tabs>

@@ -123,6 +123,11 @@
     .node circle.bg{stroke:rgba(255,255,255,.2);stroke-width:2}
     /* Label stroke: prevent name blur on dark nodes */
     .node text.label{fill:#d8eef4;font-size:12px;font-weight:700;pointer-events:none;user-select:none;paint-order:stroke;stroke:#06111a;stroke-width:3px;stroke-linejoin:round}
+    .score-label{transition:fill 0.4s ease}
+    .score-label.flash-up{fill:#4ade80 !important}
+    .score-label.flash-down{fill:#f87171 !important}
+    @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-28px)}}
+    .score-delta{pointer-events:none;font-size:11px;font-weight:700;text-anchor:middle;animation:floatUp 1.2s ease-out forwards}
     .node text.glyph{font-size:28px;font-weight:800;pointer-events:none;user-select:none;text-anchor:middle;dominant-baseline:central}
 
     /* Status colors: fill indicates status. Shape encoded by glyph text + border style */
@@ -3149,7 +3154,33 @@ function updateNodePosition(svgId, personId){
     if(statusRing){ statusRing.setAttribute('cx',p.x+17); statusRing.setAttribute('cy',p.y+17); }
     if(statusGlyph){ statusGlyph.setAttribute('x',p.x+17); statusGlyph.setAttribute('y',p.y+17); }
     const scoreLabel = nodeG.querySelector('text.score-label');
-    if(scoreLabel){ scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57); scoreLabel.textContent=`Acc ${p.score}`; }
+    if(scoreLabel){
+      const prevScore = parseInt(scoreLabel.dataset.score ?? String(p.score));
+      const diff = p.score - prevScore;
+      scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57);
+      scoreLabel.textContent=`Acc ${p.score}`;
+      scoreLabel.dataset.score = String(p.score);
+      if(diff !== 0){
+        scoreLabel.classList.remove('flash-up','flash-down');
+        void scoreLabel.offsetWidth;
+        scoreLabel.classList.add(diff > 0 ? 'flash-up' : 'flash-down');
+        setTimeout(()=>scoreLabel.classList.remove('flash-up','flash-down'), 600);
+        const svgEl = nodeG.ownerSVGElement;
+        if(svgEl){
+          const dt = document.createElementNS('http://www.w3.org/2000/svg','text');
+          dt.setAttribute('class','score-delta');
+          dt.setAttribute('x', p.x);
+          dt.setAttribute('y', p.y+45);
+          dt.setAttribute('fill', diff>0 ? '#4ade80' : '#f87171');
+          dt.setAttribute('paint-order','stroke');
+          dt.setAttribute('stroke','#06111a');
+          dt.setAttribute('stroke-width','2');
+          dt.textContent = (diff>0?'+':'')+diff;
+          svgEl.appendChild(dt);
+          setTimeout(()=>{ try{svgEl.removeChild(dt);}catch(_){} }, 1300);
+        }
+      }
+    }
   }
   // 更新关联边
   p.ties.forEach(t=>{
@@ -4299,7 +4330,10 @@ function postGameEnded(){
         history: state.history,
         hiddenTiesStats,
         aggressiveIndex: state.aggressiveIndex,
-        conservativeIndex: state.conservativeIndex
+        conservativeIndex: state.conservativeIndex,
+        finalPeople: Object.entries(state.people)
+          .filter(([id])=>id!=='pm')
+          .map(([id,p])=>({ id, name: p.name, score: p.score, status: p.status }))
       }
     }, '*');
   }catch(_){}

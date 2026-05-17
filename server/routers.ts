@@ -203,9 +203,24 @@ const leaderboardRouter = router({
       const rows = await withDbRetry(() => getLeaderboard(input.limit));
       return rows.map((r, i) => ({ ...r, rank: i + 1 }));
     }),
-
   stats: publicProcedure.query(async () => {
     return withDbRetry(() => getLeaderboardStats());
+  }),
+  /** Return per-person final acceptance scores for the top-scoring session */
+  topPeopleScores: publicProcedure.query(async () => {
+    const rows = await withDbRetry(() => getLeaderboard(1));
+    if (!rows.length) return { playerName: null, totalScore: 0, peopleScores: {} as Record<string, number> };
+    const top = rows[0];
+    const turns = await withDbRetry(() => getSessionTurns(top.id));
+    // Reconstruct final per-person score by replaying movers from all turns
+    const scores: Record<string, number> = {};
+    for (const turn of turns) {
+      const movers = (turn.movers ?? []) as Array<{ id: string; name: string; before: number; after: number }>;
+      for (const m of movers) {
+        scores[m.id] = m.after;
+      }
+    }
+    return { playerName: top.playerName, totalScore: top.totalScore ?? 0, peopleScores: scores };
   }),
 });
 
