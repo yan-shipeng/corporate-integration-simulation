@@ -267,7 +267,7 @@ function TurnOverlay({ turn, onDismiss }: { turn: TurnData; onDismiss: () => voi
         )}
         {weeksUsed !== null && (
           <div className="text-xs font-medium" style={{ color: isFinal ? `${finalHex}88` : "#fbbf2499", animation: "fadeUp 0.2s ease-out 0.26s both" }}>
-            ⏱ {weeksUsed} weeks used
+            ⏱ {weeksUsed} resources used
           </div>
         )}
       </div>
