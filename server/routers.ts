@@ -371,9 +371,23 @@ const enLeaderboardRouter = router({
       const rows = await withDbRetry(() => getEnLeaderboard(input.limit));
       return rows.map((r, i) => ({ ...r, rank: i + 1 }));
     }),
-
   stats: publicProcedure.query(async () => {
     return withDbRetry(() => getEnLeaderboardStats());
+  }),
+  /** Return per-person final acceptance scores for the top-scoring English session */
+  topPeopleScores: publicProcedure.query(async () => {
+    const rows = await withDbRetry(() => getEnLeaderboard(1));
+    if (!rows.length) return { playerName: null, totalScore: 0, peopleScores: {} as Record<string, number> };
+    const top = rows[0];
+    const turns = await withDbRetry(() => getEnSessionTurns(top.id));
+    const scores: Record<string, number> = {};
+    for (const turn of turns) {
+      const movers = (turn.movers ?? []) as Array<{ id: string; name: string; before: number; after: number }>;
+      for (const m of movers) {
+        scores[m.id] = m.after;
+      }
+    }
+    return { playerName: top.playerName, totalScore: top.totalScore ?? 0, peopleScores: scores };
   }),
 });
 

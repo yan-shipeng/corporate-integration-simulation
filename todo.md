@@ -631,3 +631,13 @@
 - [x] Create EnGamePage.tsx (/en/game)
 - [x] Create EnLeaderboardPage.tsx (/en/leaderboard)
 - [x] Register /en routes in App.tsx
+
+## Phase 120: Mobile & English Engine Fixes (Session 5)
+- [x] Fixed mobile "Execute Decision" button hidden behind bottom nav: set .decision-footer { bottom: 64px !important } and padding-bottom: 210px for decision screen in @media (max-width: 768px)
+- [x] Added enLeaderboard.topPeopleScores tRPC procedure (mirrors leaderboard.topPeopleScores for English sessions)
+- [x] Added EnPeerComparisonTable component to EnGamePage.tsx (compares per-person acceptance scores vs top player)
+- [x] Added Peer Comparison tab to EnResultPage with tab switcher (My Results / Peer Comparison)
+- [x] Updated GameResult interface to include finalPeople field
+- [x] Added acceptance score color coding on English network graph nodes: 0-30 red, 31-60 yellow, 61-100 green
+- [x] Confirmed all user-visible text uses "Resources" not "weeks" (internal JS property names kept as-is)
+- [x] TypeScript: 0 errors

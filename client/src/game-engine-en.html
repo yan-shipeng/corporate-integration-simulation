@@ -510,7 +510,8 @@
 
     /* Add bottom padding so content isn't hidden behind bottom nav */
     .app { padding-bottom: 72px !important; }
-    body.decision-active #screen-decision { padding-bottom: 140px !important; }
+    body.decision-active #screen-decision { padding-bottom: 210px !important; }
+    .decision-footer { bottom: 64px !important; }
 
     /* Network SVG: full viewport height minus HUD and bottom nav */
     #screen-network .svg-wrapper {
@@ -3177,7 +3178,8 @@ function drawNetwork(svgId){
       scoreText.setAttribute('text-anchor','middle');
       scoreText.setAttribute('font-size','10');
       scoreText.setAttribute('font-weight','600');
-      scoreText.setAttribute('fill','rgba(13,209,180,0.75)');
+      const scoreColor = p.score <= 30 ? 'rgba(248,113,113,0.9)' : p.score <= 60 ? 'rgba(250,204,21,0.9)' : 'rgba(74,222,128,0.9)';
+      scoreText.setAttribute('fill', scoreColor);
       scoreText.setAttribute('pointer-events','none');
       scoreText.setAttribute('user-select','none');
       scoreText.setAttribute('paint-order','stroke');
@@ -3185,6 +3187,7 @@ function drawNetwork(svgId){
       scoreText.setAttribute('stroke-width','2.5');
       scoreText.setAttribute('stroke-linejoin','round');
       scoreText.textContent=`${p.score}`;
+      scoreText.dataset.score = String(p.score);
       nodeG.appendChild(scoreText);
     }
 
@@ -3292,6 +3295,11 @@ function updateNodePosition(svgId, personId){
       scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57);
       scoreLabel.textContent=`${p.score}`;
       scoreLabel.dataset.score = String(p.score);
+      // Update color based on score value
+      if(!scoreLabel.classList.contains('flash-up') && !scoreLabel.classList.contains('flash-down')){
+        const sc = p.score <= 30 ? 'rgba(248,113,113,0.9)' : p.score <= 60 ? 'rgba(250,204,21,0.9)' : 'rgba(74,222,128,0.9)';
+        scoreLabel.setAttribute('fill', sc);
+      }
       if(diff !== 0){
         scoreLabel.classList.remove('flash-up','flash-down');
         void scoreLabel.offsetWidth;

@@ -100,6 +100,7 @@ interface GameResult {
   history: TurnData[];
   aggressiveIndex?: number;
   conservativeIndex?: number;
+  finalPeople?: Array<{ id: string; name: string; score: number; status: number }>;
 }
 
 interface ConversionData {
@@ -290,6 +291,64 @@ function TurnOverlay({ turn, onDismiss }: { turn: TurnData; onDismiss: () => voi
   );
 }
 
+// ─── Peer Comparison Table (English) ─────────────────────────────────────────
+function EnPeerComparisonTable({ finalPeople }: { finalPeople?: Array<{ id: string; name: string; score: number; status: number }> }) {
+  const { data: topData, isLoading } = trpc.enLeaderboard.topPeopleScores.useQuery();
+  const STATUS_LABELS = ['Unaware', 'Aware', 'Interested', 'Participated', 'Converted'];
+  const STATUS_COLORS = ['text-white/40', 'text-blue-400', 'text-cyan-400', 'text-purple-400', 'text-emerald-400'];
+  if (isLoading) return <div className="flex items-center justify-center py-12 text-white/40 text-sm"><Loader2 className="w-4 h-4 mr-2 animate-spin" />Loading peer data…</div>;
+  if (!topData || !topData.playerName) return <div className="flex items-center justify-center py-12 text-white/40 text-sm">No peer data yet — needs at least one completed game from another player.</div>;
+  if (!finalPeople || finalPeople.length === 0) return <div className="flex items-center justify-center py-12 text-white/40 text-sm">Per-person data unavailable for this session.</div>;
+  const topScores = topData.peopleScores as Record<string, number>;
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-lg">🏆</span>
+          <span className="font-semibold text-white">Comparing with: {topData.playerName}</span>
+          <span className="ml-auto text-xs text-white/40">Score: {Math.round(Number(topData.totalScore))}</span>
+        </div>
+        <div className="text-xs text-white/40">Positive gap means you outperformed the top player on that stakeholder; negative means room for improvement.</div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="text-left py-2 px-3 text-white/40 font-medium">Stakeholder</th>
+              <th className="text-center py-2 px-3 text-white/40 font-medium">Your Score</th>
+              <th className="text-center py-2 px-3 text-white/40 font-medium">Top Player</th>
+              <th className="text-center py-2 px-3 text-white/40 font-medium">Gap</th>
+              <th className="text-left py-2 px-3 text-white/40 font-medium">Your Final Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {finalPeople.map(p => {
+              const topScore = topScores[p.id] ?? 0;
+              const diff = p.score - topScore;
+              return (
+                <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <td className="py-2 px-3 font-medium text-white">{p.name}</td>
+                  <td className="py-2 px-3 text-center font-mono text-white">{p.score}</td>
+                  <td className="py-2 px-3 text-center font-mono text-white/40">{topScore > 0 ? topScore : '—'}</td>
+                  <td className="py-2 px-3 text-center font-mono font-semibold">
+                    {topScore > 0 ? (
+                      <span className={diff >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                        {diff >= 0 ? '+' : ''}{diff}
+                      </span>
+                    ) : '—'}
+                  </td>
+                  <td className={`py-2 px-3 text-sm ${STATUS_COLORS[p.status] ?? 'text-white/40'}`}>
+                    {STATUS_LABELS[p.status] ?? 'Unknown'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 // ─── Simple Result Page (English) ─────────────────────────────────────────────
 function EnResultPage({ result, playerName, isSaved, onRestart }: {
   result: GameResult;
@@ -297,6 +356,7 @@ function EnResultPage({ result, playerName, isSaved, onRestart }: {
   isSaved?: boolean;
   onRestart: () => void;
 }) {
+  const [activeTab, setActiveTab] = useState<'summary' | 'peer'>('summary');
   const won = result.won;
   const score = Math.round(Number(result.totalScore) || 0);
   const converted = Number(result.convertedCount) || 0;
@@ -318,7 +378,7 @@ function EnResultPage({ result, playerName, isSaved, onRestart }: {
     <div className="min-h-screen bg-[#0a0f0d] text-white overflow-y-auto">
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="text-6xl mb-4">{won ? "🏆" : "💪"}</div>
           <h1 className="text-4xl font-black mb-2">
             {won ? "Integration Successful!" : "Change Stalled"}
@@ -331,55 +391,82 @@ function EnResultPage({ result, playerName, isSaved, onRestart }: {
           )}
         </div>
 
-        {/* Score */}
-        <div className="bg-white/5 rounded-2xl p-8 text-center mb-6 border border-white/10">
-          <div className="text-7xl font-black text-emerald-400 mb-2">{score}</div>
-          <div className="text-white/40 text-sm">Total Score</div>
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            {[
-              { label: "Converted", value: `${converted}/${total}`, color: "text-emerald-400" },
-              { label: "Rounds", value: rounds, color: "text-blue-400" },
-              { label: "Resources Left", value: resources, color: "text-yellow-400" },
-            ].map(({ label, value, color }) => (
-              <div key={label}>
-                <div className={`text-2xl font-bold ${color}`}>{value}</div>
-                <div className="text-white/40 text-xs mt-1">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {[
-            { label: "Final Credibility", value: cred, max: 100, color: "#22d3ee" },
-            { label: "Final Resistance", value: pressure, max: 100, color: "#f87171" },
-          ].map(({ label, value, max, color }) => (
-            <div key={label} className="bg-white/5 rounded-xl p-4 border border-white/10">
-              <div className="text-xs text-white/40 mb-2">{label}</div>
-              <div className="text-2xl font-bold" style={{ color }}>{value}</div>
-              <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%`, background: color }} />
-              </div>
-            </div>
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 border-b border-white/10 pb-0">
+          {(['summary', 'peer'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                activeTab === tab
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-b-0 border-emerald-500/30'
+                  : 'text-white/40 hover:text-white/70'
+              }`}
+            >
+              {tab === 'summary' ? '📊 My Results' : '🏆 Peer Comparison'}
+            </button>
           ))}
         </div>
 
-        {/* Trend chart */}
-        {trendData.length > 0 && (
+        {activeTab === 'summary' && (
+          <>
+            {/* Score */}
+            <div className="bg-white/5 rounded-2xl p-8 text-center mb-6 border border-white/10">
+              <div className="text-7xl font-black text-emerald-400 mb-2">{score}</div>
+              <div className="text-white/40 text-sm">Total Score</div>
+              <div className="grid grid-cols-3 gap-4 mt-6">
+                {[
+                  { label: "Converted", value: `${converted}/${total}`, color: "text-emerald-400" },
+                  { label: "Rounds", value: rounds, color: "text-blue-400" },
+                  { label: "Resources Left", value: resources, color: "text-yellow-400" },
+                ].map(({ label, value, color }) => (
+                  <div key={label}>
+                    <div className={`text-2xl font-bold ${color}`}>{value}</div>
+                    <div className="text-white/40 text-xs mt-1">{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* KPIs */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {[
+                { label: "Final Credibility", value: cred, max: 100, color: "#22d3ee" },
+                { label: "Final Resistance", value: pressure, max: 100, color: "#f87171" },
+              ].map(({ label, value, max, color }) => (
+                <div key={label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-xs text-white/40 mb-2">{label}</div>
+                  <div className="text-2xl font-bold" style={{ color }}>{value}</div>
+                  <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%`, background: color }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Trend chart */}
+            {trendData.length > 0 && (
+              <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-6">
+                <div className="text-xs text-white/40 mb-3">Progress Over Rounds</div>
+                <ResponsiveContainer width="100%" height={160}>
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="round" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
+                    <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
+                    <Tooltip contentStyle={{ background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+                    <Line type="monotone" dataKey="cred" stroke="#22d3ee" dot={false} strokeWidth={2} name="Credibility" />
+                    <Line type="monotone" dataKey="pressure" stroke="#f87171" dot={false} strokeWidth={2} name="Resistance" />
+                    <Line type="monotone" dataKey="converted" stroke="#4ade80" dot={false} strokeWidth={2} name="Converted" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === 'peer' && (
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-6">
-            <div className="text-xs text-white/40 mb-3">Progress Over Rounds</div>
-            <ResponsiveContainer width="100%" height={160}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="round" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                <Tooltip contentStyle={{ background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
-                <Line type="monotone" dataKey="cred" stroke="#22d3ee" dot={false} strokeWidth={2} name="Credibility" />
-                <Line type="monotone" dataKey="pressure" stroke="#f87171" dot={false} strokeWidth={2} name="Resistance" />
-                <Line type="monotone" dataKey="converted" stroke="#4ade80" dot={false} strokeWidth={2} name="Converted" />
-              </LineChart>
-            </ResponsiveContainer>
+            <EnPeerComparisonTable finalPeople={result.finalPeople} />
           </div>
         )}
 
