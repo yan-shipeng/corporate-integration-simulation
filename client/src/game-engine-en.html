@@ -434,6 +434,112 @@
     background: #fff5f5;
   }
 
+
+  /* ── Mobile Adaptations ── */
+  /* Bottom navigation bar (mobile only) */
+  #mobileBottomNav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 200;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+  }
+  #mobileBottomNav .mbn-inner {
+    display: flex;
+    height: 56px;
+  }
+  #mobileBottomNav .mbn-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    padding: 6px 4px;
+  }
+  #mobileBottomNav .mbn-btn.active {
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+  #mobileBottomNav .mbn-btn .mbn-icon { font-size: 18px; line-height: 1; }
+  #mobileBottomNav .mbn-btn .mbn-label { font-size: 10px; }
+
+  /* Floating "Make Decision" CTA on network screen (mobile only) */
+  #mobileDecideCta {
+    display: none;
+    position: fixed;
+    bottom: 68px; left: 50%; transform: translateX(-50%);
+    z-index: 190;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 28px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(13,139,150,0.5);
+    cursor: pointer;
+    white-space: nowrap;
+    animation: mobileCtaPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes mobileCtaPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(13,139,150,0.5); }
+    50% { box-shadow: 0 4px 28px rgba(13,139,150,0.85); }
+  }
+
+  @media (max-width: 768px) {
+    /* Show bottom nav, hide top tabs */
+    #mobileBottomNav { display: block; }
+    #tabsBar { display: none !important; }
+
+    /* Show floating CTA only on network screen */
+    body.screen-network #mobileDecideCta { display: block; }
+    body.screen-decision #mobileDecideCta { display: none; }
+    body.screen-log #mobileDecideCta { display: none; }
+    body.screen-ending #mobileDecideCta { display: none; }
+
+    /* Add bottom padding so content isn't hidden behind bottom nav */
+    .app { padding-bottom: 72px !important; }
+    body.decision-active #screen-decision { padding-bottom: 140px !important; }
+
+    /* Network SVG: full viewport height minus HUD and bottom nav */
+    #screen-network .svg-wrapper {
+      height: calc(100svh - 220px) !important;
+      min-height: 260px;
+      touch-action: none;
+    }
+    #screen-network .layout { grid-template-columns: 1fr !important; }
+
+    /* Decision screen: actions list full width, hide secondary network panel */
+    #screen-decision > div[data-decision-grid] {
+      grid-template-columns: 1fr !important;
+    }
+    #screen-decision > div[data-decision-grid] > .panel:nth-child(2) {
+      display: none !important;
+    }
+
+    /* Modal: full-screen on mobile */
+    .modal-card {
+      max-width: 100% !important;
+      width: 100% !important;
+      max-height: 90vh !important;
+      border-radius: 20px 20px 0 0 !important;
+      margin: auto 0 0 0 !important;
+    }
+    .modal {
+      align-items: flex-end !important;
+    }
+  }
   </style>
 </head>
 <body>
@@ -1069,8 +1175,8 @@
     <section class="screen" id="screen-task">
       <div class="hero">
         <h2>Mission Overview <span id="currentRoleBadge" class="badge" style="margin-left:8px;background:var(--primary-light);color:var(--primary);font-weight:600">🎛️ Integration Lead</span></h2>
-        <p id="roleBriefingText" style="margin:8px 0">You are the Integration Lead of a multinational corporation. The company has just completed a major acquisition and aims to drive new governance and collaboration practices within 48 resources.</p>
-        <div class="small" id="roleGoalText" style="padding:8px 12px;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:4px"><strong>Your Target:</strong>Within 48 Resources, convert as many key stakeholders to "Converted" status as possible while maintaining organizational health.</div>
+        <p id="roleBriefingText" style="margin:8px 0">You are the Integration Lead of a multinational corporation. The company has just completed a major acquisition and aims to drive new governance and collaboration practices within 60 resource units.</p>
+        <div class="small" id="roleGoalText" style="padding:8px 12px;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:4px"><strong>Your Target:</strong>Within 60 resource units, convert as many key stakeholders to "Converted" status as possible while maintaining organizational health.</div>
         <div class="badges" style="margin-top:12px"><span class="badge">Understand mission</span><span class="badge">View social network</span><span class="badge">Make decisions</span></div>
         <button class="btn btn-primary" id="startBtn2" style="margin-top:14px">View Social Network →</button>
       </div>
@@ -1188,6 +1294,25 @@
     </section>
   </div>
 
+  <!-- Mobile Bottom Navigation -->
+  <div id="mobileBottomNav" style="display:none">
+    <div class="mbn-inner">
+      <button class="mbn-btn active" id="mbnNetwork" onclick="showScreen('network')">
+        <span class="mbn-icon">&#127760;</span>
+        <span class="mbn-label">Network</span>
+      </button>
+      <button class="mbn-btn" id="mbnDecision" onclick="showScreen('decision')">
+        <span class="mbn-icon">&#9889;</span>
+        <span class="mbn-label">Decide</span>
+      </button>
+      <button class="mbn-btn" id="mbnLog" onclick="showScreen('log')">
+        <span class="mbn-icon">&#128196;</span>
+        <span class="mbn-label">Log</span>
+      </button>
+    </div>
+  </div>
+  <!-- Floating Make Decision CTA (mobile network screen) -->
+  <button id="mobileDecideCta" style="display:none" onclick="showScreen('decision')">Make Decision &#8594;</button>
   <div class="swipe-hint" id="swipeHint">
     <span class="dot" data-i="0"></span><span class="dot" data-i="1"></span><span class="dot" data-i="2"></span><span class="dot" data-i="3"></span>
     <span style="margin-left:8px">Swipe left/right to switch pages</span>
@@ -2665,6 +2790,13 @@ function showScreen(name){
   el('screen-'+name).classList.add('active');
   // v14：决策页激活浮动底部按钮
   document.body.classList.toggle('decision-active', name==='decision');
+  // Mobile: sync body class for CTA visibility + bottom nav active state
+  ['network','decision','log','ending'].forEach(s=>document.body.classList.remove('screen-'+s));
+  document.body.classList.add('screen-'+name);
+  // Sync mobile bottom nav active state
+  const mbnMap = {network:'mbnNetwork', decision:'mbnDecision', log:'mbnLog'};
+  document.querySelectorAll('#mobileBottomNav .mbn-btn').forEach(b=>b.classList.remove('active'));
+  if(mbnMap[name]){ const b=el(mbnMap[name]); if(b) b.classList.add('active'); }
   renderTabs();
   if(name==='log') renderLogScreen();
   if(name==='ending') renderEndingScreen();
@@ -3052,7 +3184,7 @@ function drawNetwork(svgId){
       scoreText.setAttribute('stroke','#06111a');
       scoreText.setAttribute('stroke-width','2.5');
       scoreText.setAttribute('stroke-linejoin','round');
-      scoreText.textContent=`Acc ${p.score}`;
+      scoreText.textContent=`${p.score}`;
       nodeG.appendChild(scoreText);
     }
 
@@ -3158,7 +3290,7 @@ function updateNodePosition(svgId, personId){
       const prevScore = parseInt(scoreLabel.dataset.score ?? String(p.score));
       const diff = p.score - prevScore;
       scoreLabel.setAttribute('x',p.x); scoreLabel.setAttribute('y',p.y+57);
-      scoreLabel.textContent=`Acc ${p.score}`;
+      scoreLabel.textContent=`${p.score}`;
       scoreLabel.dataset.score = String(p.score);
       if(diff !== 0){
         scoreLabel.classList.remove('flash-up','flash-down');
@@ -3331,7 +3463,7 @@ function buildActionCard(a, idx){
         const prevThresh = thresholds[thresholds.indexOf(nextThresh)-1] || 0;
         const barPct = nextThresh > prevThresh ? Math.round((p.score - prevThresh) / (nextThresh - prevThresh) * 100) : 100;
         const barColor = p.status===4 ? 'var(--success)' : p.score >= nextThresh*0.8 ? '#f59e0b' : 'var(--primary)';
-        const scoreLabel = `${p.score} acc`;
+        const scoreLabel = `${p.score}`;
         const blocks = Math.round(barPct/20); // 0-5 filled blocks out of 5
         const barBlocks = '█'.repeat(blocks) + '░'.repeat(5-blocks);
         return `<button class="target ${state.selectedTargets.includes(id)?'on':''}" data-id="${id}" ${disabledAttr} ${riskStyle} onclick="event.stopPropagation();toggleTarget('${id}')">
@@ -3367,7 +3499,7 @@ function buildActionCard(a, idx){
           <span>✓ ${GLYPHS[p.status]+' '+p.name} ${soft2}${bridge2}${prefMark2}</span>
           <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">
             <span style="color:${barColor2};letter-spacing:-1px;font-size:10px">${barBlocks2}</span>
-            <span style="color:var(--text);font-weight:600">${p.score} acc</span>
+            <span style="color:var(--text);font-weight:600">${p.score}</span>
           </span>
         </button>`;
       }).join('')}</div></div>`;
@@ -3375,11 +3507,11 @@ function buildActionCard(a, idx){
     const reasonChips = [];
     if(credBad) reasonChips.push('<span class="chip bad reason-chip">Insufficient Credibility (requires</span>'+a.reqCred+'）</span>');
     if(wait>0) reasonChips.push('<span class="chip bad reason-chip">Still need to wait</span>'+wait+'rounds</span>');
-    if(state.resources<a.weeks) reasonChips.push('<span class="chip bad reason-chip">Insufficient Resources (requires</span>'+a.weeks+'Resources）</span>');
+    if(state.resources<a.weeks) reasonChips.push(`<span class="chip bad reason-chip">Insufficient Resources (requires ${a.weeks} resources)</span>`);
 
     // v14：头部可见的禁用原因简要Hint
     const headerBadge = isHardDisabled
-      ? `<span class="disabled-badge" title="${[wait>0?'Cooling down, '+wait+' rounds remaining':'',state.resources<a.weeks?'Insufficient Resources, need '+a.weeks+' Resources':''].filter(Boolean).join(' · ')}" style="${wait>0?'background:rgba(99,102,241,0.15);color:#818cf8;border-color:rgba(99,102,241,0.4);':''}">
+      ? `<span class="disabled-badge" title="${[wait>0?'Cooling down, '+wait+' rounds remaining':'',state.resources<a.weeks?`Insufficient Resources, need ${a.weeks} resources`:''].filter(Boolean).join(' · ')}" style="${wait>0?'background:rgba(99,102,241,0.15);color:#818cf8;border-color:rgba(99,102,241,0.4);':''}">
           ${wait>0?'⏳ Still needs '+wait+' rounds':'⛔ Insufficient Resources'}
         </span>`
       : credBad
@@ -4775,7 +4907,7 @@ function renderMobileListPanel(){
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <span class="status s${p.status}" style="padding:2px 8px;font-size:11px">${STATUS_LABELS[p.status]}</span>
-        <span style="font-size:11px;color:var(--muted)">${p.score} acc</span>
+        <span style="font-size:11px;color:var(--muted)">${p.score}</span>
       </div>
     </div>`;
   }).join('');
@@ -4836,6 +4968,9 @@ function revealSimulationChrome(){
   if(hudBar) hudBar.style.display = '';
   const tabsBar = el('tabsBar');
   if(tabsBar) tabsBar.style.display = '';
+  // Show mobile bottom nav
+  const mobileNav = el('mobileBottomNav');
+  if(mobileNav) mobileNav.style.display = '';
   const badge = el('learnerBadge');
   if(badge){
     if(state.learnerName){
@@ -5323,5 +5458,81 @@ document.addEventListener('keydown',(e)=>{
     }
   });
 })();
+
+/* ── Mobile Pinch-to-Zoom for SVG Network Graph ── */
+(function initPinchZoom(){
+  function setupPinch(svgEl){
+    if(!svgEl || svgEl._pinchInit) return;
+    svgEl._pinchInit = true;
+    let startDist = 0, startScale = 1, currentScale = 1;
+    let startMidX = 0, startMidY = 0;
+    let panStartX = 0, panStartY = 0, panOffX = 0, panOffY = 0;
+    let isPanning = false;
+    const MIN_SCALE = 0.4, MAX_SCALE = 4;
+
+    function getDist(t){ return Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY); }
+    function getMid(t){ return { x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2 }; }
+    function applyTransform(){ svgEl.style.transform = `translate(${panOffX}px,${panOffY}px) scale(${currentScale})`; svgEl.style.transformOrigin = '50% 50%'; }
+
+    svgEl.parentElement.addEventListener('touchstart', function(e){
+      if(e.touches.length===2){
+        e.preventDefault();
+        startDist = getDist(e.touches);
+        startScale = currentScale;
+        const mid = getMid(e.touches);
+        startMidX = mid.x; startMidY = mid.y;
+        isPanning = false;
+      } else if(e.touches.length===1){
+        isPanning = true;
+        panStartX = e.touches[0].clientX - panOffX;
+        panStartY = e.touches[0].clientY - panOffY;
+      }
+    }, {passive:false});
+
+    svgEl.parentElement.addEventListener('touchmove', function(e){
+      if(e.touches.length===2){
+        e.preventDefault();
+        const dist = getDist(e.touches);
+        currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, startScale * (dist/startDist)));
+        applyTransform();
+      } else if(e.touches.length===1 && isPanning){
+        e.preventDefault();
+        panOffX = e.touches[0].clientX - panStartX;
+        panOffY = e.touches[0].clientY - panStartY;
+        applyTransform();
+      }
+    }, {passive:false});
+
+    svgEl.parentElement.addEventListener('touchend', function(e){
+      if(e.touches.length < 2) isPanning = false;
+    });
+
+    // Double-tap to reset
+    let lastTap = 0;
+    svgEl.parentElement.addEventListener('touchend', function(e){
+      const now = Date.now();
+      if(now - lastTap < 300 && e.touches.length===0){
+        currentScale = 1; panOffX = 0; panOffY = 0;
+        applyTransform();
+      }
+      lastTap = now;
+    });
+  }
+
+  // Setup after SVG is initialized
+  function trySetup(){
+    const svg1 = document.getElementById('networkSvg');
+    if(svg1) setupPinch(svg1);
+  }
+  // Try on DOMContentLoaded and also after a short delay (SVG may be rendered later)
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', trySetup);
+  } else {
+    trySetup();
+  }
+  setTimeout(trySetup, 2000);
+  setTimeout(trySetup, 5000);
+})();
+
 </script></body>
 </html>
